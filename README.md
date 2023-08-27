@@ -40,6 +40,4 @@ backend/
 |-- package.json
 |-- package-lock.json
 |-- README.md
-
-
 ```

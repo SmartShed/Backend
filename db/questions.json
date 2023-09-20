@@ -1,0 +1,42 @@
+[
+  {
+    "queId": 1,
+    "queText": "किसी भी ढीली या गायब बोतलों के लिए कैटल गार्ड और रेल गार्ड की जाँच ।\nCheck cattle guard and rail guard for any slack or missing bottles."
+  },
+  {
+    "queId": 2,
+    "queText": "कैटल गार्ड की ऊंचाई 6.5\" और रेल गार्ड की ऊंचाई 4.5\" समायोजित करें ।\nAdjust the height of cattle guard 6.5” and that of rail guard 4.5\"."
+  },
+  {
+    "queId": 3,
+    "queText": "किसी भी ढीले बोल्ट के लिए वीएसए यॉ डैम्पर की जाँच करें।\nCheck VSA Yaw damper for any slack bolts."
+  },
+  {
+    "queId": 4,
+    "queText": "किसी भी टूट-फूट के लिए कॉइल स्प्रिंग्स की जाँच करें।\nCheck coil springs for any breakage."
+  },
+  {
+    "queId": 5,
+    "queText": "किसी भी क्षति और ढीले बोल्ट के लिए लोड पैड की जाँच करें।\nCheck load pad for any damages and slack bolts."
+  },
+  {
+    "queId": 6,
+    "queText": "ब्रेक पिस्टन यात्रा की लंबाई रिकॉर्ड करें और यदि आवश्यक हो तो समायोजित करें।\nRecord brake piston travel length and adjust if required."
+  },
+  {
+    "queId": 7,
+    "queText": "ब्रेक सिलेंडर पाइपलाइनों में किसी भी रिसाव की जाँच करें। किसी भी ढीले बोल्ट के लिए ब्रेक सिलेंडर की जाँच करें।\nCheck any leakages in Brake cylinder pipelines. Check brake cylinder for any slack bolts."
+  },
+  {
+    "queId": 8,
+    "queText": "सैंडर्स ब्रैकेट, होज़ और नोजल की जाँच करें।\nCheck sanders bracket, hoses and nozzles."
+  },
+  {
+    "queId": 9,
+    "queText": "वीएसए की ऊपरी और निचली स्थिति की जाँच करें और स्पेसर की उपलब्धता की भी जाँच करें, ट्रकों में रगड़ के निशान या दरार की जाँच करें।\nCheck VSA top and bottom condition, check spacer for rubber availability. Check rubbing marks or cracks in trucks."
+  },
+  {
+    "queId": 10,
+    "queText": "टूटे हुए बोल्ट या स्लैक या बोल्ट के लिए टीपी ब्रैकेट की जाँच करें।\nCheck TP bracket for broken bolt or slack or bolt."
+  }
+]

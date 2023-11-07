@@ -92,7 +92,6 @@ const formHelpers = {
         let formData = JSON.parse(formsData);
         formData = formData.filter(form => form.formId == formId)[0];
 
-        console.log("formData", formData);
         const form = {
             "formId": formData.formId,
             "formName": formData.formName,
@@ -117,11 +116,14 @@ const formHelpers = {
             questionsData = JSON.parse(questionsData);
 
 
+
             let questions = [];
 
-            for (let i = 0; i < formData.questions.length; i++) {
-                if (formData.questions[i].questionId == questionsData[i].questionId) {
-                    questions.push(questionsData[i]);
+            for (let i = 0; i < questionsData.length; i++) {
+                for (let j = 0; j < formData.questions.length; j++) {
+                    if (questionsData[i].queId == formData.questions[j]) {
+                        questions.push(questionsData[i]);
+                    }
                 }
             }
 

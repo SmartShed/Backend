@@ -39,8 +39,9 @@ const formController = {
     createFormController: async (req, res) => {
         const { formId } = req.params;
         const { userId } = req.body;
+
         const questions = await formHelpers.createFormByFormId(userId, formId);
-        console.log("questions", questions);
+
         res.json(questions);
     }
 }

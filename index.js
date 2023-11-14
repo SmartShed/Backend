@@ -76,10 +76,15 @@ app.post("/api/addsection", async (req, res) => {
 
 app.post("/api/addform", async (req, res) => {
 
+
 	const form = req.body;
 
+	console.log("form", form);
+
 	try {
-		const tempForm = await FormData.find({ formID: form.formID });
+		const tempForm = await FormData.findOne({ formID: form.formID });
+
+		console.log("tempForm", tempForm);
 
 		if (tempForm) {
 			res.status(400).send("Form ID already exists");
@@ -88,9 +93,13 @@ app.post("/api/addform", async (req, res) => {
 
 		const newForm = new FormData(form);
 
-		newForm.save()
-			.then(() => res.status(200).send("Form added"))
-			.catch((err) => res.status(400).send(err));
+		console.log("newForm", newForm);
+		await newForm.save()
+
+		res.status(200).json({ message: "Form added" });
+
+
+
 	}
 	catch (err) {
 		res.status(400).json({ message: err.message });

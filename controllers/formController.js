@@ -1,4 +1,7 @@
 const { formHelpers } = require('../helpers');
+const formModel = require('../models/Form');
+const FormData = require('../models/FormData');
+const QuestionData = require('../models/QuestionData');
 
 const formController = {
     recentFormController: async (req, res) => {

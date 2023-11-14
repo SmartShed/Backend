@@ -34,22 +34,27 @@ const login = async (req, res) => {
             });
         }
 
-        const token = jwt.sign(
+
+        const auth_token = jwt.sign(
             { id: user._id },
             JWT_SECRET,
             { expiresIn: "1week" }
         );
 
+
+
         const authToken = new AuthToken({
-            token,
+            token: auth_token,
             user: user._id
         });
 
         await authToken.save();
 
 
+
+
         res.status(200).json({
-            token,
+            auth_token,
             message: "Login successful"
         });
     }
@@ -143,7 +148,7 @@ const logout = async (req, res) => {
         });
     }
     catch (err) {
-        res.status(400).json({ message: err.message });
+        res.status(400).json({ message: "logout failed" });
     }
 }
 

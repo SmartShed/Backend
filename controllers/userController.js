@@ -1,6 +1,10 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const AuthToken = require("../models/AuthToken");
+
+const { JWT_SECRET } = require("../config");
+
 
 
 const login = async (req, res) => {
@@ -12,33 +16,48 @@ const login = async (req, res) => {
         });
     }
 
-    const user = await User.findOne({ email });
+    try {
+        const user = await User.findOne({ email });
 
-    if (!user) {
-        return res.status(400).json({
-            message: "User not found"
+
+        if (!user) {
+            return res.status(400).json({
+                message: "User not found"
+            });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+
+        if (!isMatch) {
+            return res.status(400).json({
+                message: "Incorrect password"
+            });
+        }
+
+        const token = jwt.sign(
+            { id: user._id },
+            JWT_SECRET,
+            { expiresIn: "1week" }
+        );
+
+        const authToken = new AuthToken({
+            token,
+            user: user._id
+        });
+
+        await authToken.save();
+
+
+        res.status(200).json({
+            token,
+            message: "Login successful"
         });
     }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    if (!isMatch) {
-        return res.status(400).json({
-            message: "Incorrect password"
-        });
+    catch (err) {
+        res.status(400).json({ message: err.message });
     }
-
-    const token = jwt.sign(
-        { id: user._id },
-        process.env.JWT_SECRET,
-        { expiresIn: "1h" }
-    );
-
-    res.status(200).json({
-        token,
-        message: "Login successful"
-    });
 };
+
 
 
 const register = async (req, res) => {
@@ -51,34 +70,86 @@ const register = async (req, res) => {
         });
     }
 
-    const user = User.findOne({ email });
+    try {
+        const user = await User.findOne({ email });
 
-    if (user) {
+
+        if (user) {
+            return res.status(400).json({
+                message: "User already exists"
+            });
+        }
+
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        const newUser = new User({
+            email,
+            password: hashedPassword,
+            name,
+            position
+        });
+
+        await newUser.save();
+
+        // Create a new JWT for the user
+        const token = jwt.sign(
+            { id: newUser._id },
+            JWT_SECRET,
+            { expiresIn: "1week" }
+        );
+
+
+        // Create a new auth token for the user and save it to the database
+        const authToken = new AuthToken({
+            token,
+            user: newUser._id
+        });
+
+        await authToken.save();
+
+        res.status(201).json({
+            auth_token: token,
+            message: "Registration successful"
+        });
+    }
+    catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+}
+
+const logout = async (req, res) => {
+    const { auth_token } = req.headers;
+
+
+    if (!auth_token) {
         return res.status(400).json({
-            message: "User already exists"
+            message: "Token is required"
         });
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    try {
 
-    const newUser = new User({
-        email,
-        password: hashedPassword,
-        name,
-        position
-    });
 
-    await newUser.save();
+        const authToken = await AuthToken.findOne({ token: auth_token });
 
-    res.status(201).json({
-        message: "User created"
-    });
+        const deleteToken = await AuthToken.deleteOne(authToken);
+
+
+
+        res.status(200).json({
+            message: "Logout successful"
+        });
+    }
+    catch (err) {
+        res.status(400).json({ message: err.message });
+    }
 }
 
 
 
 
 module.exports = {
-    login, register
+    login, register, logout
 };

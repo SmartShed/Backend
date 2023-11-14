@@ -9,7 +9,7 @@ const FormData = require("./models/FormData");
 const { APP_PORT } = require("./config");
 const connectDB = require("./config/database");
 
-const { formRoutes } = require('./routes')
+const { formRoutes, userRoutes } = require('./routes')
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -26,6 +26,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/forms", formRoutes)
+app.use("/api/auth", userRoutes);
 
 app.post("/api/addquestion", async (req, res) => {
 	const question = req.body;

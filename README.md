@@ -12,6 +12,8 @@ backend/
 |-- controllers/
 |   |-- index.js
 |   |-- userController.js
+|   |-- formController.js
+|   |-- sectionController.js
 |
 |-- helpers/
 |   |-- index.js
@@ -22,13 +24,19 @@ backend/
 |   |-- errorHandling.js
 |
 |-- models/
+|   |-- AuthToken.js
 |   |-- Form.js
+|   |-- FormData.js
 |   |-- Question.js
+|   |-- QuestionData.js
+|   |-- SectionData.js
 |   |-- User.js
 |
 |-- routes/
 |   |-- index.js
 |   |-- userRoutes.js
+|   |-- formRoutes.js
+|   |-- sectionRoutes.js
 |
 |-- utils/
 |   |-- index.js

@@ -1,4 +1,5 @@
 const formController = require('./formController');
+const sectionController = require('./sectionController');
 
 
-module.exports = { formController }
+module.exports = { formController, sectionController }

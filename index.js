@@ -27,59 +27,73 @@ app.get("/", (req, res) => {
 
 app.use("/api/forms", formRoutes)
 
-app.post("/api/addquestion", (req, res) => {
+app.post("/api/addquestion", async (req, res) => {
 	const question = req.body;
 
 
-	const isRepeated = QuestionData.find({ questionID: question.questionID });
+	try {
+		const que = await QuestionData.findOne({ questionID: question.questionID });
+		console.log(que);
+		if (que) {
+			res.status(400).send("Question ID already exists");
+			return;
+		}
 
-	if (isRepeated) {
-		res.status(400).send("Question ID already exists");
-		return;
+		const newQuestion = new QuestionData(question);
+
+		newQuestion.save()
+			.then(() => res.status(200).send("Question added"))
+			.catch((err) => res.status(400).send(err));
 	}
-
-	const newQuestion = new QuestionData(question);
-
-	newQuestion.save()
-		.then(() => res.status(200).send("Question added"))
-		.catch((err) => res.status(400).send(err));
+	catch (err) {
+		res.status(400).json({ message: err.message });
+	}
 }
 );
 
-app.post("/api/addsection", (req, res) => {
+app.post("/api/addsection", async (req, res) => {
 	const section = req.body;
 
-	const isRepeated = SectionData.find({ sectionID: section.sectionID });
+	try {
+		const sec = await SectionData.findOne({ sectionID: section.sectionID });
 
-	if (isRepeated) {
-		res.status(400).send("Section ID already exists");
-		return;
+		if (sec) {
+			res.status(400).send("Section ID already exists");
+			return;
+		}
+
+		const newSection = new SectionData(section);
+
+		newSection.save()
+			.then(() => res.status(200).send("Section added"))
+			.catch((err) => res.status(400).send(err));
+	} catch (err) {
+		res.status(400).json({ message: err.message });
 	}
-
-	const newSection = new SectionData(section);
-
-	newSection.save()
-		.then(() => res.status(200).send("Section added"))
-		.catch((err) => res.status(400).send(err));
 }
 );
 
-app.post("/api/addform", (req, res) => {
+app.post("/api/addform", async (req, res) => {
 
 	const form = req.body;
 
-	const isRepeated = FormData.find({ formID: form.formID });
+	try {
+		const tempForm = await FormData.find({ formID: form.formID });
 
-	if (isRepeated) {
-		res.status(400).send("Form ID already exists");
-		return;
+		if (tempForm) {
+			res.status(400).send("Form ID already exists");
+			return;
+		}
+
+		const newForm = new FormData(form);
+
+		newForm.save()
+			.then(() => res.status(200).send("Form added"))
+			.catch((err) => res.status(400).send(err));
 	}
-
-	const newForm = new FormData(form);
-
-	newForm.save()
-		.then(() => res.status(200).send("Form added"))
-		.catch((err) => res.status(400).send(err));
+	catch (err) {
+		res.status(400).json({ message: err.message });
+	}
 
 });
 

@@ -1,11 +1,11 @@
-const Section = require('../models/SectionData');
-const Form = require('../models/Form');
+const SectionData = require('../models/SectionData');
+const FormData = require('../models/FormData');
 
 
 const getAllSections = async (req, res) => {
 
     try {
-        const sections = await Section.find({});
+        const sections = await SectionData.find({});
         const res = {
             "status": "success",
             "message": "Sections fetched successfully",
@@ -19,33 +19,33 @@ const getAllSections = async (req, res) => {
     }
 };
 
-// GET a section by ID
-// Path: controllers/sectionController.js
-
 const getFormsBySectionId = async (req, res) => {
     try {
-        const sectionId = req.params.id;
-        const section = await Section.find({ sectionID: sectionId });
+        const sectionID = req.params.id;
+        const section = await SectionData.find({ sectionID: sectionID });
 
         const forms = [];
         for (let i = 0; i < section.forms.length; i++) {
-            let form = await Form.find({ formID: section.forms[i] });
-            let formObg = {
-                id: form[0].formID,
-                title: form[0].title,
-                description: form[0].description,
+            let form = await FormData.findOne({ formID: section.forms[i] });
+            let formObj = {
+                id: form.formID,
+                title: form.title,
+                description: form.description,
             }
-            forms.push(formObg);
+            forms.push(formObj);
         }
 
-        const res = {
+
+        res.status(200).json({
             "status": "success",
             "message": "Forms fetched successfully",
             "forms": forms
-        }
-        res.status(200).json(res);
+        });
     } catch (err) {
-        res.status(400).json({ message: err.message });
+        res.status(400).json({
+            "status": "error",
+            "message": "Forms fetching failed",
+        });
     }
 }
 

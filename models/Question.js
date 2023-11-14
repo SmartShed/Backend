@@ -5,6 +5,7 @@ const questionSchema = mongoose.Schema({
     questionID: { type: String, required: true },
     questionText: { type: String, required: true },
     ansType: { type: String, enum: ['string', 'numeric'], required: true },
+    isAnswered: { type: Boolean, default: false },
     ans: { type: String },
 });
 

@@ -9,7 +9,7 @@ const userSchema = mongoose.Schema({
     address: { type: String },
     position: { type: String, enum: ['authority', 'supervisor', 'worker'], required: true },
     password: { type: String, required: true },
-    forms: [{ type: Schema.Types.ObjectId, ref: 'Form' }],
+    forms: [{ type: String }],
 });
 
 module.exports = mongoose.model('User', userSchema);

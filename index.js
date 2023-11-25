@@ -12,11 +12,11 @@ const FormData = require("./models/FormData");
 const { APP_PORT } = require("./config");
 const connectDB = require("./config/database");
 
-const { formRoutes, userRoutes, workerRoutes } = require('./routes')
+const { formRoutes, userRoutes, workerRoutes, sectionRoutes } = require('./routes')
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-//body parser
+
 
 
 
@@ -33,6 +33,8 @@ app.get("/", (req, res) => {
 app.use("/api/forms", formRoutes)
 app.use("/api/auth", userRoutes);
 app.use("/api/workers", workerRoutes);
+app.use("/api/sections", sectionRoutes);
+
 
 app.post("/api/addquestion", async (req, res) => {
 	const question = req.body;

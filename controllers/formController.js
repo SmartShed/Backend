@@ -1,52 +1,49 @@
-const { formHelpers } = require('../helpers');
-const formModel = require('../models/Form');
-const FormData = require('../models/FormData');
-const QuestionData = require('../models/QuestionData');
+const { formHelpers } = require("../helpers");
+const formModel = require("../models/Form");
+const FormData = require("../models/FormData");
+const QuestionData = require("../models/QuestionData");
 
 const formController = {
-    recentFormController: async (req, res) => {
-        const { userId } = req.params;
+  recentFormController: async (req, res) => {
+    const { userId } = req.params;
 
-        const forms = formHelpers.getUserForms(userId);
+    const forms = formHelpers.getUserForms(userId);
 
-        const data = [];
-        for (let i = 0; i < forms.length; i++) {
-            const form = {
-                formId: forms[i].formId,
-                formName: forms[i].formName,
-                id: forms[i]._id,
-            }
-            data.push(form);
-
-        }
-        res.json(data);
+    const data = [];
+    for (let i = 0; i < forms.length; i++) {
+      const form = {
+        formId: forms[i].formId,
+        formName: forms[i].formName,
+        id: forms[i]._id,
+      };
+      data.push(form);
     }
-    ,
-    createController: async (req, res) => {
-        const { formId } = req.params;
+    res.json(data);
+  },
+  createController: async (req, res) => {
+    const { formId } = req.params;
 
-        const forms = await formHelpers.getFormsByFormId(formId);
-        const data = [];
-        for (let i = 0; i < forms.length; i++) {
-            const form = {
-                formId: forms[i].formId,
-                formName: forms[i].formName,
-                id: forms[i]._id,
-            }
-            data.push(form);
-
-        }
-        res.json(data);
-    },
-
-    createFormController: async (req, res) => {
-        const { formId } = req.params;
-        const { userId } = req.body;
-
-        const questions = await formHelpers.createFormByFormId(userId, formId);
-
-        res.json(questions);
+    const forms = await formHelpers.getFormsByFormId(formId);
+    const data = [];
+    for (let i = 0; i < forms.length; i++) {
+      const form = {
+        formId: forms[i].formId,
+        formName: forms[i].formName,
+        id: forms[i]._id,
+      };
+      data.push(form);
     }
-}
+    res.json(data);
+  },
+
+  createFormController: async (req, res) => {
+    const { formId } = req.params;
+    const { userId } = req.body;
+
+    const questions = await formHelpers.createFormByFormId(userId, formId);
+
+    res.json(questions);
+  },
+};
 
 module.exports = formController;

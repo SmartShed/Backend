@@ -201,17 +201,17 @@ POST /api/auth/addemployee
 
 #### 1.6.2. Request Body
 
-| Field       | Type             | Description          |
-| ----------- | ---------------- | -------------------- |
-| workers     | array of strings | Emails of Workers    |
-| supervisors | array of strings | Emails of Supervisor |
-| authoritys  | array of strings | Emails of Authoritys |
+| Field      | Type             | Description          |
+| ---------- | ---------------- | -------------------- |
+| worker     | array of strings | Emails of Workers    |
+| supervisor | array of strings | Emails of Supervisor |
+| authority  | array of strings | Emails of Authoritys |
 
 ```json
 {
-  "workers": ["worker02@gmail.com"],
-  "supervisor": ["supervisor01@gmail.com"],
-  "authority": []
+  "worker": ["worker01@gmail.com", "worker02@gmail.com", "worker03@gmail.com"],
+  "supervisor": ["supervisor01@gmail.com", "supervisor02@gmail.com"],
+  "authority": ["authority01@gmail.com"]
 }
 ```
 

@@ -110,7 +110,7 @@ const register = async (req, res) => {
 
         const validEmails = await EmployeeEmail.findOne();
 
-        console.log(validEmails);
+
 
         if (!validEmails || !validEmails[position] || !validEmails[position].includes(email)) {
             return res.status(400).json({
@@ -237,10 +237,20 @@ const googleLogin = async (req, res) => {
 
 const googleRegister = async (req, res) => {
 
+
     try {
         validateRequest(req, googleRegisterSchema);
 
         const { email, name, position } = req.body;
+
+        const validEmails = await EmployeeEmail.findOne();
+
+        if (!validEmails || !validEmails[position] || !validEmails[position].includes(email)) {
+            return res.status(400).json({
+                message: "Invalid email for the specified position"
+            });
+        }
+
         const user = await User.findOne({ email });
 
 

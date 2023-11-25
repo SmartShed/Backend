@@ -6,7 +6,6 @@ const QuestionData = require('../../models/QuestionData');
 const User = require('../../models/User');
 
 
-
 const createForm = async (req, res) => {
     form_id = req.params.form_id;
     console.log("form_id", form_id);
@@ -117,6 +116,8 @@ const getForm = async (req, res) => {
             const question = await Question.findOne({ _id: form.questions[i] });
             questionsData.push(question);
         }
+
+
 
         res.status(200).json(
             {

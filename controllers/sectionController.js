@@ -5,12 +5,11 @@ const getAllSections = async (req, res) => {
 
     try {
         const sections = await SectionData.find({});
-        const res = {
-            "status": "success",
+        const data = {
             "message": "Sections fetched successfully",
             "sections": sections
         }
-        res.status(200).json(res);
+        res.status(200).json(data);
 
     } catch (err) {
 

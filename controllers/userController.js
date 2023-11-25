@@ -2,6 +2,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const AuthToken = require("../models/AuthToken");
+const EmployeeEmail = require("../models/EmployeeEmail");
 const Joi = require("joi");
 
 const { JWT_SECRET } = require("../config");
@@ -276,7 +277,39 @@ const googleRegister = async (req, res) => {
 
 
 
+const removeDuplicates = (arr) => [...new Set(arr)];
+
+
+const addEmployee = async (req, res) => {
+    const { workers, supervisor, authority } = req.body;
+
+    try {
+
+        let existingInstance = await EmployeeEmail.findOne();
+
+        if (!existingInstance) {
+
+            existingInstance = new EmployeeEmail({ workers, supervisor, authority });
+        } else {
+
+            existingInstance.workers = removeDuplicates([...existingInstance.workers, ...workers]);
+            existingInstance.supervisor = removeDuplicates([...existingInstance.supervisor, ...supervisor]);
+            existingInstance.authority = removeDuplicates([...existingInstance.authority, ...authority]);
+        }
+
+
+        await existingInstance.save();
+
+        res.status(200).json({ message: 'Employee emails added successfully!' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
+
 
 module.exports = {
-    login, register, logout, googleLogin, googleRegister
+    login, register, logout, googleLogin, googleRegister, addEmployee
 };

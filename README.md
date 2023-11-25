@@ -188,3 +188,38 @@ POST /api/auth/register/google
   "auth_token": "token"
 }
 ```
+
+### 1.6. Add Employee
+
+For Worker, Supervisor and Authority registration
+
+#### 1.6.1. Request
+
+```http
+POST /api/auth/addemployee
+```
+
+#### 1.6.2. Request Body
+
+| Field       | Type             | Description          |
+| ----------- | ---------------- | -------------------- |
+| workers     | array of strings | Emails of Workers    |
+| supervisors | array of strings | Emails of Supervisor |
+| authoritys  | array of strings | Emails of Authoritys |
+
+```json
+{
+  "workers": ["worker02@gmail.com"],
+  "supervisor": ["supervisor01@gmail.com"],
+  "authority": []
+}
+```
+
+#### 1.6.3. Response
+
+```json
+{
+  "status": "200 | 500",
+  "message": "Employee emails added successfully! | Error"
+}
+```

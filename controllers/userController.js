@@ -304,7 +304,7 @@ const addEmployee = async (req, res) => {
             existingInstance = new EmployeeEmail({ worker, supervisor, authority });
         } else {
 
-            existingInstance.workers = removeDuplicates([...existingInstance.workers, ...worker]);
+            existingInstance.workers = removeDuplicates([...existingInstance.worker, ...worker]);
             existingInstance.supervisor = removeDuplicates([...existingInstance.supervisor, ...supervisor]);
             existingInstance.authority = removeDuplicates([...existingInstance.authority, ...authority]);
         }

@@ -161,7 +161,7 @@ POST /api/auth/login/google
 }
 ```
 
-### 1.5. Register
+### 1.5. Google Register
 
 For Worker, Supervisor and Authority registration
 

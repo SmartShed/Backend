@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const employeeEmailSchema = new mongoose.Schema({
-    workers: [{
+    worker: [{
         type: "String",
     }],
     supervisor: [

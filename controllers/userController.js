@@ -16,7 +16,7 @@ const loginSchema = Joi.object({
 
 const registerSchema = Joi.object({
     email: Joi.string().email().required(),
-    password: Joi.string().required(),
+    password: Joi.string().required().min(6).max(20),
     name: Joi.string().required(),
     position: Joi.string().valid('authority', 'supervisor', 'worker').required(),
 });
@@ -107,6 +107,18 @@ const register = async (req, res) => {
         validateRequest(req, registerSchema);
 
         const { email, password, name, position } = req.body;
+
+        const validEmails = await EmployeeEmail.findOne();
+
+        console.log(validEmails);
+
+        if (!validEmails || !validEmails[position] || !validEmails[position].includes(email)) {
+            return res.status(400).json({
+                message: "Invalid email for the specified position"
+            });
+        }
+
+
         const user = await User.findOne({ email });
 
 
@@ -281,7 +293,7 @@ const removeDuplicates = (arr) => [...new Set(arr)];
 
 
 const addEmployee = async (req, res) => {
-    const { workers, supervisor, authority } = req.body;
+    const { worker, supervisor, authority } = req.body;
 
     try {
 
@@ -289,10 +301,10 @@ const addEmployee = async (req, res) => {
 
         if (!existingInstance) {
 
-            existingInstance = new EmployeeEmail({ workers, supervisor, authority });
+            existingInstance = new EmployeeEmail({ worker, supervisor, authority });
         } else {
 
-            existingInstance.workers = removeDuplicates([...existingInstance.workers, ...workers]);
+            existingInstance.workers = removeDuplicates([...existingInstance.workers, ...worker]);
             existingInstance.supervisor = removeDuplicates([...existingInstance.supervisor, ...supervisor]);
             existingInstance.authority = removeDuplicates([...existingInstance.authority, ...authority]);
         }

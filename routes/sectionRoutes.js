@@ -11,3 +11,5 @@ router.get('/', getAllSections);
 // GET a section by ID
 router.get('/:id/forms', getFormsBySectionId);
 
+
+module.exports = router;

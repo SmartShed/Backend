@@ -9,7 +9,7 @@ const { getAllSections, getFormsBySectionId } = require('../controllers/sectionC
 router.get('/', getAllSections);
 
 // GET a section by ID
-router.get('/:id/forms', getFormsBySectionId);
+router.get('/:section_id/forms', getFormsBySectionId);
 
 
 module.exports = router;

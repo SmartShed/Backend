@@ -20,8 +20,8 @@ const getAllSections = async (req, res) => {
 
 const getFormsBySectionId = async (req, res) => {
     try {
-        const sectionID = req.params.id;
-        const section = await SectionData.find({ sectionID: sectionID });
+        const sectionID = req.params.section_id;
+        const section = await SectionData.findOne({ sectionID: sectionID });
 
         const forms = [];
         for (let i = 0; i < section.forms.length; i++) {

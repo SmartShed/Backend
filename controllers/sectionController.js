@@ -35,13 +35,11 @@ const getFormsBySectionId = async (req, res) => {
 
 
         res.status(200).json({
-            "status": "success",
             "message": "Forms fetched successfully",
             "forms": forms
         });
     } catch (err) {
         res.status(400).json({
-            "status": "error",
             "message": "Forms fetching failed",
         });
     }

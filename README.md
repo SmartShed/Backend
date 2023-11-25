@@ -134,3 +134,57 @@ POST /api/auth/logout
   "message": "Logout successful | Logout failed"
 }
 ```
+
+### 1.4. Google Login
+
+For Worker, Supervisor and Authority registration
+
+#### 1.4.1. Request
+
+```http
+POST /api/auth/login/google
+```
+
+#### 1.4.2. Request Headers
+
+| Field | Type   | Description                              |
+| ----- | ------ | ---------------------------------------- |
+| email | string | Email of Worker, Supervisor or Authority |
+
+#### 1.4.3. Response
+
+```json
+{
+  "status": "200 | 400",
+  "message": "Login successful | Login failed",
+  "auth_token": "token"
+}
+```
+
+### 1.5. Register
+
+For Worker, Supervisor and Authority registration
+
+#### 1.5.1. Request
+
+```http
+POST /api/auth/register/google
+```
+
+#### 1.5.2. Request Body
+
+| Field    | Type   | Description                                |
+| -------- | ------ | ------------------------------------------ |
+| email    | string | Email of Worker, Supervisor or Authority   |
+| name     | string | Name of employee                           |
+| position | string | Position (Worker, Supervisor or Authority) |
+
+#### 1.5.3. Response
+
+```json
+{
+  "status": "200 | 400",
+  "message": "Registration successful | Registration failed",
+  "auth_token": "token"
+}
+```

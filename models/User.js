@@ -9,7 +9,9 @@ const userSchema = mongoose.Schema({
     address: { type: String },
     position: { type: String, enum: ['authority', 'supervisor', 'worker'], required: true },
     password: { type: String, required: true },
+    isGoogle: { type: Boolean, default: false },
     forms: [{ type: String }],
 });
 
 module.exports = mongoose.model('User', userSchema);
+

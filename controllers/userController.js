@@ -2,21 +2,56 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const AuthToken = require("../models/AuthToken");
+const Joi = require("joi");
 
 const { JWT_SECRET } = require("../config");
 
 
 
-const login = async (req, res) => {
-    const { email, password } = req.body;
+const loginSchema = Joi.object({
+    email: Joi.string().email().required(),
+    password: Joi.string().required(),
+});
 
-    if (!email || !password) {
-        return res.status(400).json({
-            message: "Email and password are required"
-        });
+const registerSchema = Joi.object({
+    email: Joi.string().email().required(),
+    password: Joi.string().required(),
+    name: Joi.string().required(),
+    position: Joi.string().valid('authority', 'supervisor', 'worker').required(),
+});
+
+const logoutSchema = Joi.object({
+    auth_token: Joi.string().required(),
+});
+
+const googleLoginSchema = Joi.object({
+    email: Joi.string().email().required(),
+});
+
+const googleRegisterSchema = Joi.object({
+    email: Joi.string().email().required(),
+    name: Joi.string().required(),
+    position: Joi.string().valid('authority', 'supervisor', 'worker').required(),
+});
+
+const validateRequest = (req, schema) => {
+    const { error } = schema.validate(req.body, { abortEarly: false });
+    if (error) {
+        const errorMessage = error.details.map((detail) => detail.message).join(', ');
+        throw new Error(errorMessage);
     }
+};
+
+
+
+
+const login = async (req, res) => {
+
 
     try {
+        validateRequest(req, loginSchema);
+
+        const { email, password } = req.body;
         const user = await User.findOne({ email });
 
 
@@ -67,15 +102,10 @@ const login = async (req, res) => {
 
 const register = async (req, res) => {
 
-    const { email, password, name, position } = req.body;
-
-    if (!email || !password || !name || !position) {
-        return res.status(400).json({
-            message: "All fields are required"
-        });
-    }
-
     try {
+        validateRequest(req, registerSchema);
+
+        const { email, password, name, position } = req.body;
         const user = await User.findOne({ email });
 
 
@@ -125,17 +155,14 @@ const register = async (req, res) => {
 }
 
 const logout = async (req, res) => {
-    const { auth_token } = req.headers;
 
 
-    if (!auth_token) {
-        return res.status(400).json({
-            message: "Token is required"
-        });
-    }
+
 
     try {
+        validateRequest(req, logoutSchema);
 
+        const { auth_token } = req.headers;
 
         const authToken = await AuthToken.findOne({ token: auth_token });
 
@@ -155,6 +182,102 @@ const logout = async (req, res) => {
 
 
 
+const googleLogin = async (req, res) => {
+
+
+
+    try {
+        validateRequest(req, googleLoginSchema);
+
+        const { email } = req.body;
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({
+                message: "User not found"
+            });
+        }
+
+
+        const auth_token = jwt.sign(
+            { id: user._id },
+            JWT_SECRET,
+            { expiresIn: "1week" }
+        );
+
+
+        const authToken = new AuthToken({
+            token: auth_token,
+            user: user._id
+        });
+        await authToken.save();
+        res.status(200).json({
+            auth_token,
+            message: "Login successful"
+        });
+    }
+    catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+
+
+}
+
+const googleRegister = async (req, res) => {
+    console.log(req.body);
+
+    try {
+        validateRequest(req, googleRegisterSchema);
+
+        const { email, name, position } = req.body;
+        const user = await User.findOne({ email });
+
+
+        if (user) {
+            return res.status(400).json({
+                message: "User already exists"
+            });
+        }
+
+
+        const newUser = new User({
+            email,
+            name,
+            position,
+            password: "google",
+            isGoogle: true
+        });
+
+        await newUser.save();
+
+
+        const token = jwt.sign(
+            { id: newUser._id },
+            JWT_SECRET,
+            { expiresIn: "1week" }
+        );
+
+
+        const authToken = new AuthToken({
+            token,
+            user: newUser._id
+        });
+
+        await authToken.save();
+
+        res.status(201).json({
+            auth_token: token,
+            message: "Registration successful"
+        });
+    }
+    catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+}
+
+
+
+
+
 module.exports = {
-    login, register, logout
+    login, register, logout, googleLogin, googleRegister
 };

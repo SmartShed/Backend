@@ -156,11 +156,11 @@ const register = async (req, res) => {
 
 const logout = async (req, res) => {
 
-
+    console.log(req.headers);
 
 
     try {
-        validateRequest(req, logoutSchema);
+        validateRequest(req.headers, logoutSchema);
 
         const { auth_token } = req.headers;
 
@@ -175,7 +175,7 @@ const logout = async (req, res) => {
         });
     }
     catch (err) {
-        res.status(400).json({ message: "logout failed" });
+        res.status(400).json({ message: err.message });
     }
 }
 
@@ -223,7 +223,6 @@ const googleLogin = async (req, res) => {
 }
 
 const googleRegister = async (req, res) => {
-    console.log(req.body);
 
     try {
         validateRequest(req, googleRegisterSchema);

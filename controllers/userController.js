@@ -284,6 +284,37 @@ const addEmployee = async (req, res) => {
   }
 };
 
+const me = async (req, res) => {
+  try {
+    const auth_token = req.headers.auth_token;
+
+    if (!auth_token) {
+      throw new Error("Auth token not found");
+    }
+
+    const user_id = await AuthToken.findOne({ token: auth_token }, { user: 1 });
+
+    if (!user_id) {
+      throw new Error("Invalid auth token");
+    }
+
+    const user = await User.findOne({ _id: user_id.user });
+
+    if (!user) {
+      throw new Error("User not foundd");
+    }
+
+    res.status(200).json({
+      id: user._id,
+      email: user.email,
+      name: user.name,
+      position: user.position,
+    });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
 module.exports = {
   login,
   register,
@@ -291,4 +322,5 @@ module.exports = {
   googleLogin,
   googleRegister,
   addEmployee,
+  me,
 };

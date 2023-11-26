@@ -8,8 +8,6 @@ const User = require("../../models/User");
 const createForm = async (req, res) => {
   form_id = req.params.form_id;
 
-
-
   const auth_token = req.headers.auth_token;
 
   // posibility of error
@@ -22,9 +20,6 @@ const createForm = async (req, res) => {
       return;
     }
 
-
-
-
     const user = await User.findOne({ _id: user_id.user });
 
     if (!user) {
@@ -32,13 +27,9 @@ const createForm = async (req, res) => {
       return;
     }
 
-
-
     const formData = await FormData.findOne({ formID: form_id });
     if (!formData) {
-      res
-        .status(400)
-        .json({ message: "Form ID does not exist" });
+      res.status(400).json({ message: "Form ID does not exist" });
       return;
     }
 
@@ -51,7 +42,6 @@ const createForm = async (req, res) => {
         questionID: questionIDs[i],
       });
 
-
       const newQuestion = new Question({
         questionID: question.questionID,
         questionText: question.questionText,
@@ -60,20 +50,18 @@ const createForm = async (req, res) => {
         ans: "",
       });
 
-
       let tempQuestion = {
-        "questionID": newQuestion.questionID,
-        "questionText": newQuestion.questionText,
-        "ansType": newQuestion.ansType,
-        "_id": newQuestion._id,
-      }
+        questionID: newQuestion.questionID,
+        questionText: newQuestion.questionText,
+        ansType: newQuestion.ansType,
+        _id: newQuestion._id,
+      };
 
       questionsCompleteData.push(tempQuestion);
       await newQuestion.save();
 
       questionsData.push(newQuestion._id);
     }
-
 
     const newForm = new Form({
       formID: form_id,
@@ -91,11 +79,12 @@ const createForm = async (req, res) => {
       history: [],
     });
 
-
-
     await newForm.save();
 
-    console.log("Response");
+    user.forms.push(newForm._id);
+
+    await user.save();
+
     res.status(201).json({
       message: "Form created successfully",
       form: {
@@ -133,8 +122,6 @@ const getForm = async (req, res) => {
         isAnswered: question.isAnswered,
       });
     }
-
-
 
     res.status(200).json({
       message: "Form retrieved successfully",
@@ -180,14 +167,11 @@ const getAnswer = async (req, res) => {
       return;
     }
 
-
-
     for (let i = 0; i < form.history.length; i++) {
       if (form.history[i].changes.questionID == question._id) {
         const questionHistory = form.history[i];
 
         const user = await User.findOne({ _id: questionHistory.editedBy });
-
 
         res.status(201).json({
           message: "Answer retrieved successfully",
@@ -201,7 +185,6 @@ const getAnswer = async (req, res) => {
     }
 
     res.status(201).json({
-
       message: "Answer retrieved successfully",
       answer: question.ans,
       answer_by: {
@@ -210,9 +193,7 @@ const getAnswer = async (req, res) => {
       },
     });
   } catch (err) {
-    res
-      .status(500)
-      .json({ message: "Answer retrieval failed" });
+    res.status(500).json({ message: "Answer retrieval failed" });
   }
 };
 
@@ -232,8 +213,6 @@ const getAnswerOfForm = async (req, res) => {
     let answers = [];
     for (let i = 0; i < form.questions.length; i++) {
       const question = await Question.findOne({ _id: form.questions[i] });
-
-
 
       let questionHistory = null;
       for (let j = 0; j < form.history.length; j++) {
@@ -271,9 +250,7 @@ const getAnswerOfForm = async (req, res) => {
       answers: answers,
     });
   } catch (err) {
-    res
-      .status(500)
-      .json({ message: "Answers retrieval failed" });
+    res.status(500).json({ message: "Answers retrieval failed" });
   }
 };
 

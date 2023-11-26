@@ -18,10 +18,17 @@ const getRecentForms = async (req, res) => {
 
     const user = await User.findOne({ _id: user_id });
 
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    if (!user.forms) {
+      throw new Error("User has no forms");
+    }
+
     const formIds = user.forms;
     let forms = await Form.findMany({ _id: { $in: formIds } })
-      .sort({ createdAt: -1 })
-      .limit(5);
+      .sort({ updatedAt: -1 });
 
     forms = forms.map((form) => {
       return {

@@ -1,12 +1,11 @@
 const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
 
-const formSchema = mongoose.Schema({
-  formID: { type: String, required: true, unique: true },
+const formSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String },
-  questions: [{ type: String }],
-  sectionID: [{ type: String }],
+  subForms: [{ type: mongoose.Types.ObjectId, ref: "SubFormData" }],
+  questions: [{ type: mongoose.Types.ObjectId, ref: "QuestionData" }],
+  sectionID: { type: mongoose.Types.ObjectId, ref: "SectionData" },
 });
 
 module.exports = mongoose.model("FormData", formSchema);

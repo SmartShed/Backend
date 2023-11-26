@@ -16,6 +16,7 @@ const {
   userRoutes,
   workerRoutes,
   sectionRoutes,
+  smartShedRoutes,
 } = require("./routes");
 
 app.use(express.json());
@@ -34,15 +35,13 @@ app.use("/api/forms", formRoutes);
 app.use("/api/auth", userRoutes);
 app.use("/api/workers", workerRoutes);
 app.use("/api/sections", sectionRoutes);
-
-
+app.use("/api/create", smartShedRoutes);
 
 app.get("/api/getquestions", async (req, res) => {
   const questions = await QuestionData.find();
 
   res.status(200).json(questions);
 });
-
 
 app.post("/api/addquestion", async (req, res) => {
   const question = req.body;
@@ -118,17 +117,11 @@ app.listen(APP_PORT, () => {
   console.log(`Server is running on port ${APP_PORT}`);
 });
 
-
-
-
-
 // {
 //   "email": "worker02@gmail.com",
 //     "password": "12344524"
 // auth_token : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1NjJlZjFjZjYyNDZhNmExMjQyODkwOSIsImlhdCI6MTcwMDk4MzA4MywiZXhwIjoxNzAxNTg3ODgzfQ.fWU_UYYL4K0rZRjuYkQ41-485ISkWR8GjZfwkB0Xk-s
 // }
-
-
 
 // name
 // "Parth"
@@ -140,8 +133,6 @@ app.listen(APP_PORT, () => {
 // "$2a$10$CUDpwyK5tb63rykvyhQMp.lCeLK9NyhWOMQNx00x3RLVpXrHIyQuO"
 // auth_token : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1NjI1MTZhMWQ1ZWJlNTIwMTZhNzYzNyIsImlhdCI6MTcwMDk4MzE5MiwiZXhwIjoxNzAxNTg3OTkyfQ.c3MS0VVhyIxBIzkGz4eLgwM_v-YoXEVL1dSabn9lM00
 
-
 // note
 // table
 // subform
-

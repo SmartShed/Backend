@@ -1,12 +1,13 @@
 const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
 
-const questionSchema = mongoose.Schema({
-  questionID: { type: String, required: true },
-  questionText: { type: String, required: true },
-  ansType: { type: String, enum: ["string", "numeric"], required: true },
+const questionSchema = new mongoose.Schema({
+  questionID: { type: mongoose.Types.ObjectId, ref: "QuestionData" },
+  englishText: { type: String },
+  hindiText: { type: String },
+  ansType: { type: String, enum: ["string", "number", "boolean"] },
   isAnswered: { type: Boolean, default: false },
-  ans: { type: String },
+  // ans: { type: Union[(String, Number, Boolean)] },
+  ans: { type: mongoose.Schema.Types.Mixed, default: null },
 });
 
 module.exports = mongoose.model("Question", questionSchema);

@@ -8,6 +8,7 @@ const {
   googleLogin,
   googleRegister,
   addEmployee,
+  me,
 } = require("../controllers/userController");
 
 router.post("/login", login);
@@ -21,5 +22,7 @@ router.post("/login/google", googleLogin);
 router.post("/register/google", googleRegister);
 
 router.post("/addemployee", addEmployee);
+
+router.get("/me", me);
 
 module.exports = router;

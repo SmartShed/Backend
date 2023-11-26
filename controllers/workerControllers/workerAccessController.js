@@ -12,23 +12,30 @@ const getRecentForms = async (req, res) => {
     }
 
     const user_id = await AuthToken.findOne({ token: auth_token }, { user: 1 });
+
     if (!user_id) {
       throw new Error("Invalid auth token");
     }
 
-    const user = await User.findOne({ _id: user_id });
+    const user = await User.findOne({ _id: user_id.user });
 
     if (!user) {
-      throw new Error("User not found");
+      throw new Error("User not foundd");
     }
 
-    if (!user.forms) {
-      throw new Error("User has no forms");
+    if (!user.forms.length) {
+      return res.status(200).json({
+        status: "success",
+        message: "No forms found",
+        forms: [],
+      });
     }
 
     const formIds = user.forms;
-    let forms = await Form.findMany({ _id: { $in: formIds } })
-      .sort({ updatedAt: -1 });
+
+    let forms = await Form.find({ _id: { $in: formIds } }).sort({
+      updatedAt: -1,
+    });
 
     forms = forms.map((form) => {
       return {
@@ -41,12 +48,12 @@ const getRecentForms = async (req, res) => {
       };
     });
 
-    const res = {
+    const response = {
       status: "success",
       message: "Forms fetched successfully",
       forms: forms,
     };
-    res.status(200).json(res);
+    res.status(200).json(response);
   } catch (err) {
     res.status(400).json({ status: "error", message: err.message });
   }
@@ -82,13 +89,11 @@ const getRecentFormsBySection = async (req, res) => {
       };
     });
 
-    res
-      .status(200)
-      .json({
-        status: "success",
-        message: "Forms fetched successfully",
-        forms: forms,
-      });
+    res.status(200).json({
+      status: "success",
+      message: "Forms fetched successfully",
+      forms: forms,
+    });
   } catch (err) {
     res.status(400).json({ status: "error", message: err.message });
   }
@@ -121,13 +126,11 @@ const getOpenedFormsBySection = async (req, res) => {
       };
     });
 
-    res
-      .status(200)
-      .json({
-        status: "success",
-        message: "Forms fetched successfully",
-        forms: forms,
-      });
+    res.status(200).json({
+      status: "success",
+      message: "Forms fetched successfully",
+      forms: forms,
+    });
   } catch (err) {
     res.status(400).json({ status: "error", message: err.message });
   }

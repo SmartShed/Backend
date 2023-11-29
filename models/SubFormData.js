@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 
 const subFormSchema = new mongoose.Schema({
-  titleHindi: { type: String, required: true },
-  titleEnglish: { type: String, required: true },
+  titleHindi: { type: String, default: "" },
+  titleEnglish: { type: String, default: "" },
   note: { type: String },
   questions: [{ type: mongoose.Types.ObjectId, ref: "QuestionData" }],
   formID: { type: mongoose.Types.ObjectId, ref: "FormData" },

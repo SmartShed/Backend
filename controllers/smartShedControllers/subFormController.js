@@ -10,10 +10,6 @@ const addSubForm = async (req, res) => {
     if (note) note = note.trim();
     if (formID) formID = formID.trim();
 
-    if (!title || !formID) {
-      throw new Error("SubForm title or form ID not found");
-    }
-
     // Check if form exists
     const form = await FormData.findById(formID);
 
@@ -61,13 +57,6 @@ const addSubForms = async (req, res) => {
     if (!form) {
       throw new Error("Form not found");
     }
-
-    // Validate subForms
-    subForms.forEach((subForm) => {
-      if (!subForm.titleHindi || !subForm.titleEnglish) {
-        throw new Error("SubForm title not found");
-      }
-    });
 
     // Create subForms
     const newSubForms = await SubFormData.insertMany(subForms);

@@ -3,7 +3,12 @@ const FormData = require("../../models/FormData");
 
 const addForm = async (req, res) => {
   try {
-    const { title, description, sectionID } = req.body;
+    let { title, descriptionHindi, descriptionEnglish, sectionID } = req.body;
+
+    if (title) title = title.trim();
+    if (descriptionHindi) descriptionHindi = descriptionHindi.trim();
+    if (descriptionEnglish) descriptionEnglish = descriptionEnglish.trim();
+    if (sectionID) sectionID = sectionID.trim();
 
     if (!title || !sectionID) {
       throw new Error("Form title or section ID not found");
@@ -41,7 +46,9 @@ const addForm = async (req, res) => {
 const addForms = async (req, res) => {
   try {
     // Take sectionID and array of [title, description] as input
-    const { sectionID, forms } = req.body;
+    let { sectionID, forms } = req.body;
+
+    if (sectionID) sectionID = sectionID.trim();
 
     if (!sectionID || !forms) {
       throw new Error("Section ID or forms not found");
@@ -56,16 +63,17 @@ const addForms = async (req, res) => {
 
     // Validate forms
     forms.forEach((form) => {
-      if (!form.title) {
-        throw new Error("Form title not found");
+      if (!form.title || !form.descriptionEnglish || !form.descriptionHindi) {
+        throw new Error("Form title or description not found");
       }
     });
 
     // Create forms
     const formsDB = forms.map((form) => {
       return new FormData({
-        title: form.title,
-        description: form.description,
+        title: form.title.trim(),
+        descriptionEnglish: form.descriptionEnglish.trim(),
+        descriptionHindi: form.descriptionHindi.trim(),
         subForms: [],
         questions: [],
         sectionID: sectionID,

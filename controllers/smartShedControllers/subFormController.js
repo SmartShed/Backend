@@ -3,7 +3,12 @@ const FormData = require("../../models/FormData");
 
 const addSubForm = async (req, res) => {
   try {
-    const { title, note, formID } = req.body;
+    let { titleHindi, titleEnglish, note, formID } = req.body;
+
+    if (titleHindi) titleHindi = titleHindi.trim();
+    if (titleEnglish) titleEnglish = titleEnglish.trim();
+    if (note) note = note.trim();
+    if (formID) formID = formID.trim();
 
     if (!title || !formID) {
       throw new Error("SubForm title or form ID not found");

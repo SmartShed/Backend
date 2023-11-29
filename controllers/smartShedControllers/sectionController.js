@@ -2,7 +2,9 @@ const SectionData = require("../../models/SectionData");
 
 const addSection = async (req, res) => {
   try {
-    const name = req.body.name;
+    let name = req.body.name;
+
+    if (name) name = name.trim();
 
     if (!name) {
       throw new Error("Section name not found");

@@ -3,7 +3,8 @@ const mongoose = require("mongoose");
 const formSchema = new mongoose.Schema({
   formID: { type: mongoose.Types.ObjectId, ref: "FormData" },
   title: { type: String, required: true },
-  description: { type: String },
+  descriptionHindi: { type: String, required: true },
+  descriptionEnglish: { type: String, required: true },
   questions: [{ type: mongoose.Types.ObjectId, ref: "Question" }],
   submittedCount: { type: Number, default: 0 },
   lockStatus: { type: Boolean, default: false },

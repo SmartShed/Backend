@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 
 const questionSchema = new mongoose.Schema({
-  englishText: { type: String },
-  hindiText: { type: String },
+  textEnglish: { type: String, required: true },
+  textHindi: { type: String, required: true },
   ansType: { type: String, enum: ["string", "number", "boolean"] },
   isSubForm: { type: Boolean, default: false },
   formID: {

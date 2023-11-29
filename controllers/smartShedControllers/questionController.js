@@ -4,7 +4,13 @@ const FormData = require("../../models/FormData");
 
 const addQuestion = async (req, res) => {
   try {
-    const { englishText, hindiText, ansType, formID, subFormID } = req.body;
+    let { textEnglish, textHindi, ansType, formID, subFormID } = req.body;
+
+    if (textEnglish) textEnglish = textEnglish.trim();
+    if (textHindi) textHindi = textHindi.trim();
+    if (ansType) ansType = ansType.trim();
+    if (formID) formID = formID.trim();
+    if (subFormID) subFormID = subFormID.trim();
 
     let isSubForm;
 
@@ -41,8 +47,8 @@ const addQuestion = async (req, res) => {
       }
 
       const question = new QuestionData({
-        englishText: englishText,
-        hindiText: hindiText,
+        textEnglish: textEnglish,
+        textHindi: textHindi,
         ansType: ansType,
         isSubForm: isSubForm,
         subFormID: subFormID,
@@ -67,8 +73,8 @@ const addQuestion = async (req, res) => {
       }
 
       const question = new QuestionData({
-        englishText: englishText,
-        hindiText: hindiText,
+        textEnglish: textEnglish,
+        textHindi: textHindi,
         ansType: ansType,
         isSubForm: isSubForm,
         formID: formID,
@@ -93,7 +99,10 @@ const addQuestion = async (req, res) => {
 const addQuestions = async (req, res) => {
   try {
     // Take formID OR subFormID and array of [englishText, hindiText, ansType] as input
-    const { formID, subFormID, questions } = req.body;
+    let { formID, subFormID, questions } = req.body;
+
+    if (formID) formID = formID.trim();
+    if (subFormID) subFormID = subFormID.trim();
 
     let isSubForm;
 
@@ -131,7 +140,7 @@ const addQuestions = async (req, res) => {
 
       // Validate questions
       questions.forEach((question) => {
-        if (!question.englishText || !question.hindiText || !question.ansType) {
+        if (!question.textEnglish || !question.textHindi || !question.ansType) {
           throw new Error("Question details not found");
         }
       });
@@ -141,8 +150,8 @@ const addQuestions = async (req, res) => {
 
       for (const question of questions) {
         const newQuestion = new QuestionData({
-          englishText: question.englishText,
-          hindiText: question.hindiText,
+          textEnglish: question.textEnglish.trim(),
+          textHindi: question.textHindi.trim(),
           ansType: question.ansType,
           isSubForm: isSubForm,
           subFormID: subFormID,
@@ -171,7 +180,7 @@ const addQuestions = async (req, res) => {
 
       // Validate questions
       questions.forEach((question) => {
-        if (!question.englishText || !question.hindiText || !question.ansType) {
+        if (!question.textEnglish || !question.textHindi || !question.ansType) {
           throw new Error("Question details not found");
         }
       });
@@ -181,8 +190,8 @@ const addQuestions = async (req, res) => {
       // Add questions
       for (const question of questions) {
         const newQuestion = new QuestionData({
-          englishText: question.englishText,
-          hindiText: question.hindiText,
+          textEnglish: question.textEnglish.trim(),
+          textHindi: question.textHindi.trim(),
           ansType: question.ansType,
           isSubForm: isSubForm,
           formID: formID,

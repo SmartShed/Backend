@@ -22,7 +22,8 @@ const addSubForm = async (req, res) => {
     }
 
     const subForm = new SubFormData({
-      title: title,
+      titleHindi: titleHindi,
+      titleEnglish: titleEnglish,
       note: note,
       questions: [],
       formID: formID,
@@ -46,7 +47,9 @@ const addSubForm = async (req, res) => {
 const addSubForms = async (req, res) => {
   try {
     // Take formID and array of [title, note] as input
-    const { formID, subForms } = req.body;
+    let { formID, subForms } = req.body;
+
+    if (formID) formID = formID.trim();
 
     if (!formID || !subForms) {
       throw new Error("Form ID or subForms not found");
@@ -61,7 +64,7 @@ const addSubForms = async (req, res) => {
 
     // Validate subForms
     subForms.forEach((subForm) => {
-      if (!subForm.title) {
+      if (!subForm.titleHindi || !subForm.titleEnglish) {
         throw new Error("SubForm title not found");
       }
     });

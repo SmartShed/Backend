@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 
 const formSchema = new mongoose.Schema({
+  locoName: { type: String, required: true },
+  locoNumber: { type: String, required: true },
   formID: { type: mongoose.Types.ObjectId, ref: "FormData" },
   title: { type: String, required: true },
   descriptionHindi: { type: String, required: true },

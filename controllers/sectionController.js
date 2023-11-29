@@ -17,21 +17,27 @@ const getAllSections = async (req, res) => {
     }
 };
 
+
+
 const getFormsBySectionId = async (req, res) => {
     try {
         const sectionID = req.params.section_id;
-        const section = await SectionData.findOne({ sectionID: sectionID });
 
-        const forms = [];
-        for (let i = 0; i < section.forms.length; i++) {
-            let form = await FormData.findOne({ formID: section.forms[i] });
-            let formObj = {
-                id: form.formID,
-                title: form.title,
-                description: form.description,
-            }
-            forms.push(formObj);
+        const section = await SectionData.findById(sectionID).populate('forms');
+
+        if (!section) {
+            return res.status(404).json({
+                "message": "No Forms found"
+            });
         }
+
+        const forms = section.forms.map(form => ({
+            id: form._id,
+            title: form.title,
+            descriptionHindi: form.descriptionHindi,
+            descriptionEnglish: form.descriptionEnglish,
+        }));
+
 
 
         res.status(200).json({

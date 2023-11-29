@@ -223,3 +223,57 @@ POST /api/auth/addemployee
   "message": "Employee emails added successfully! | Error"
 }
 ```
+
+## 2. Sections, Forms and Questions APIs
+
+### 2.1. Get Sections
+
+When a worker logs in, he will be redirected to the `Dashboard`. The `Dashboard` will show all the sections. The worker can click on a section to see the forms of that section.
+
+#### 2.1.1. Request
+
+```http
+GET /api/sections
+```
+
+#### 2.1.2. Response
+
+```json
+{
+  "message": "Sections fetched successfully | Sections fetching failed",
+  "sections": [
+    {
+      "_id": "section_id",
+      "name": "section_name",
+      "forms": ["_id"],
+      "__v": 1
+    }
+  ]
+}
+```
+
+### 2.2. Get Forms of a Section
+
+When worker clicks on a section in the `Dashboard`, he will be redirected to `Forms by Section` page. This page will show all the forms of that section. The worker can create a new form by clicking on form name in the `All Forms` section in the `Forms by Section` page.
+
+#### 2.2.1. Request
+
+```http
+GET /api/sections/:section_id/forms
+```
+
+#### 2.2.2. Response
+
+```json
+{
+  "message": "Forms fetched successfully | Forms fetching failed",
+  "forms": [
+    {
+      "id": "form_id",
+      "title": "form_name",
+      "descriptionHindi": "descriptionHindi",
+      "descriptionEnglish": "descriptionEnglish"
+    }
+  ]
+}
+```

@@ -5,9 +5,25 @@ const getAllSections = async (req, res) => {
 
     try {
         const sections = await SectionData.find({});
+
+        if (!sections) {
+            return res.status(404).json({
+                "message": "No Sections found"
+            });
+        }
+
+        // retrive only title of the sections
+        // const sections = sections.map(section => ({
+        //     id: section._id,
+        //     title: section.title,
+        //     
+
         const data = {
             "message": "Sections fetched successfully",
-            "sections": sections
+            "sections": sections.map(section => ({
+                id: section._id,
+                title: section.name,
+            }))
         }
         res.status(200).json(data);
 

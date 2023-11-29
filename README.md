@@ -244,9 +244,7 @@ GET /api/sections
   "sections": [
     {
       "_id": "section_id",
-      "name": "section_name",
-      "forms": ["_id"],
-      "__v": 1
+      "name": "section_name"
     }
   ]
 }

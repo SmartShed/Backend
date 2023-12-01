@@ -32,7 +32,7 @@ const getAllSections = async (req, res) => {
 
 const getFormsBySectionId = async (req, res) => {
   try {
-    const sectionID = req.params.section_id;
+    const sectionID = req.params.section_param;
 
     const section = await SectionData.findById(sectionID).populate("forms");
 
@@ -60,4 +60,36 @@ const getFormsBySectionId = async (req, res) => {
   }
 };
 
-module.exports = { getAllSections, getFormsBySectionId };
+const getFormsBySectionName = async (req, res) => {
+  try {
+    const sectionName = req.params.section_param;
+
+    const section = await SectionData.findOne({ name: sectionName }).populate(
+      "forms"
+    );
+
+    if (!section) {
+      return res.status(404).json({
+        message: "No Forms found",
+      });
+    }
+
+    const forms = section.forms.map((form) => ({
+      id: form._id,
+      title: form.title,
+      descriptionHindi: form.descriptionHindi,
+      descriptionEnglish: form.descriptionEnglish,
+    }));
+
+    res.status(200).json({
+      message: "Forms fetched successfully",
+      forms: forms,
+    });
+  } catch (err) {
+    res.status(400).json({
+      message: "Forms fetching failed",
+    });
+  }
+};
+
+module.exports = { getAllSections, getFormsBySectionId, getFormsBySectionName };

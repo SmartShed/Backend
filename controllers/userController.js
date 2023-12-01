@@ -315,6 +315,13 @@ const me = async (req, res) => {
   }
 };
 
+const forgotPassword = async (req, res) => {
+
+
+
+
+}
+
 module.exports = {
   login,
   register,
@@ -323,4 +330,5 @@ module.exports = {
   googleRegister,
   addEmployee,
   me,
+  forgotPassword,
 };

@@ -5,101 +5,106 @@ const Question = require("../../models/Question");
 const QuestionData = require("../../models/QuestionData");
 const User = require("../../models/User");
 
-const createForm = async (req, res) => {
-  form_id = req.params.form_id;
 
-  const auth_token = req.headers.auth_token;
 
-  // posibility of error
+// const createForm = async (req, res) => {
+//   const form_id = req.params.form_id;
+//   const auth_token = req.headers.auth_token;
 
-  try {
-    const user_id = await AuthToken.findOne({ token: auth_token }, { user: 1 });
+//   console.log("form_id", form_id);
+//   console.log("auth_token", auth_token);
 
-    if (!user_id) {
-      res.status(400).json({ message: "Invalid token" });
-      return;
-    }
+//   try {
+//     // find user using auth_token
 
-    const user = await User.findOne({ _id: user_id.user });
+//     const user = await AuthToken.findOne({ token: auth_token }, { user: 1 }).populate("user");
 
-    if (!user) {
-      res.status(400).json({ message: "Invalid token" });
-      return;
-    }
+//     console.log("user", user);
 
-    const formData = await FormData.findOne({ formID: form_id });
-    if (!formData) {
-      res.status(400).json({ message: "Form ID does not exist" });
-      return;
-    }
+//     if (!user) {
+//       res.status(400).json({ message: "User does not exist" });
+//       return;
+//     }
 
-    const questionIDs = formData.questions;
+//     const formdata = await FormData.findById(form_id).populate("questions").populate("subForms");
 
-    let questionsData = [];
-    let questionsCompleteData = [];
-    for (let i = 0; i < questionIDs.length; i++) {
-      const question = await QuestionData.findOne({
-        questionID: questionIDs[i],
-      });
+//     const questions = formdata.questions;
+//     const subforms = formdata.subForms;
 
-      const newQuestion = new Question({
-        questionID: question.questionID,
-        questionText: question.questionText,
-        ansType: question.ansType,
-        isAnswered: false,
-        ans: "",
-      });
 
-      let tempQuestion = {
-        questionID: newQuestion.questionID,
-        questionText: newQuestion.questionText,
-        ansType: newQuestion.ansType,
-        _id: newQuestion._id,
-      };
+//     let newQuestions = [];
+//     for (let i = 0; i < questions.length; i++) {
+//       const question = questions[i];
 
-      questionsCompleteData.push(tempQuestion);
-      await newQuestion.save();
+//       const newQuestion = await Question.create({
+//         questionID: question._id,
+//         textEnglish: question.textEnglish,
+//         textHindi: question.textHindi,
+//         ansType: question.ansType,
+//         isAnswered: false,
+//         ans: null,
+//       });
 
-      questionsData.push(newQuestion._id);
-    }
+//       await newQuestion.save();
 
-    const newForm = new Form({
-      formID: form_id,
-      title: formData.title,
-      description: formData.description,
-      questions: questionsData,
-      sectionID: formData.sectionID,
-      createdBy: user._id,
-      lockStatus: false,
-      access: [user._id],
-      createdBy: user._id,
-      submittedBy: null,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-      history: [],
-    });
+//       newQuestions.push({
+//         "_id": newQuestion._id,
+//         "textEnglish": newQuestion.textEnglish,
+//         "textHindi": newQuestion.textHindi,
+//         "ansType": newQuestion.ansType,
+//       });
+//     }
 
-    await newForm.save();
+//     let newSubForms = [];
+//     for (let i = 0; i < subforms.length; i++) {
+//       const subform = subforms[i];
 
-    user.forms.push(newForm._id);
+//       for(let i=0; i<subform.questions.length; i++) {
+//         const question_id = subform.questions[i];
 
-    await user.save();
+//         const question = await QuestionData.findById(question_id);
 
-    res.status(201).json({
-      message: "Form created successfully",
-      form: {
-        id: newForm._id,
-        name: newForm.title,
-        description: newForm.description,
-        status: newForm.lockStatus,
-        created_at: newForm.createdAt,
-      },
-      questions: questionsCompleteData,
-    });
-  } catch (err) {
-    res.status(500).json({ status: "error", message: err.message });
-  }
-};
+//         const newQuestion = await Question.create({
+//           questionID: question._id,
+//           textEnglish: question.textEnglish,
+//           textHindi: question.textHindi,
+//           ansType: question.ansType,
+//           isAnswered: false,
+//           ans: null,
+//         });
+
+//         await newQuestion.save();
+
+
+
+
+
+
+
+
+//     if (!formdata) {
+//       res.status(400).json({ message: "Form does not exist" });
+//       return;
+//     }
+
+//     const form = await Form.create({
+//       formID: formdata._id,
+//       title: formdata.title,
+//       description: formdata.descriptionEnglish,
+//       questions: formdata.questions,
+//       subForms: formdata.subForms,
+//       sectionID: formdata.sectionID,
+//       createdBy: user.user._id,
+//     });
+
+
+//   }
+
+//   catch (err) {
+//     res.status(500).json({ message: "Form creation failed" });
+//   }
+// };
+
 
 const getForm = async (req, res) => {
   // form_id is mongo id
@@ -254,4 +259,4 @@ const getAnswerOfForm = async (req, res) => {
   }
 };
 
-module.exports = { createForm, getForm, getAnswer, getAnswerOfForm };
+module.exports = { getForm, getAnswer, getAnswerOfForm };

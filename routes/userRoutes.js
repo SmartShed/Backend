@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router();
 
+
+
+
 const {
   register,
   login,
@@ -10,6 +13,8 @@ const {
   addEmployee,
   me,
   forgotPassword,
+  validateOTP,
+  resetPassword,
 } = require("../controllers/userController");
 
 router.post("/login", login);
@@ -26,6 +31,12 @@ router.post("/addemployee", addEmployee);
 
 router.get("/me", me);
 
-router.post('/forgotpassword', forgotPassword);
+router.post('/forgot-password', forgotPassword);
+
+router.post('/validate-otp', validateOTP);
+
+router.post('/reset-password', resetPassword);
+
+
 
 module.exports = router;

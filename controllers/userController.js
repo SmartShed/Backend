@@ -2,9 +2,12 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const AuthToken = require("../models/AuthToken");
+
 const EmployeeEmail = require("../models/EmployeeEmail");
+const Otp = require("../models/Otp");
 const Joi = require("joi");
 
+const { sendMail } = require("../helpers");
 const { JWT_SECRET } = require("../config");
 
 const loginSchema = Joi.object({
@@ -316,11 +319,90 @@ const me = async (req, res) => {
 };
 
 const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
 
+    console.log(email);
 
+    const user = await User.findOne({ email });
 
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
 
+    await AuthToken.deleteMany({ user: user._id });
+
+    const otp = Math.floor(100000 + Math.random() * 100000);
+
+    const newOtp = new Otp({
+      otp,
+      email,
+      expireAt: Date.now() + 5 * 60 * 1000,
+    });
+
+    await newOtp.save();
+
+    sendMail(newOtp);
+
+    res.status(200).json({ message: "OTP sent successfully" });
+
+  }
+  catch (err) {
+    res.status(400).json({ message: err.message });
+
+  }
 }
+
+const validateOTP = async (req, res) => {
+  try {
+    console.log(req.body);
+    const { email, otp } = req.body;
+
+    const otpInstance = await Otp.findOne({ email, otp });
+
+    if (!otpInstance) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    if (otpInstance.expireAt < Date.now()) {
+      return res.status(400).json({ message: "OTP expired" });
+    }
+
+    res.status(200).json({ message: "OTP validated successfully" });
+
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+}
+
+
+const resetPassword = async (req, res) => {
+  console.log(req.body);
+  const { email, password } = req.body;
+
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const user = await User.findOneAndUpdate({ email }, { password: hashedPassword });
+
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    await AuthToken.deleteMany({ user: user._id });
+
+
+    res.status(200).json({ message: "Password reset successfully" });
+
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+}
+
+
+
+
 
 module.exports = {
   login,
@@ -331,4 +413,6 @@ module.exports = {
   addEmployee,
   me,
   forgotPassword,
+  validateOTP,
+  resetPassword
 };

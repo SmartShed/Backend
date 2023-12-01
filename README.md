@@ -224,6 +224,92 @@ POST /api/auth/addemployee
 }
 ```
 
+### 1.7. Forgot Password
+
+For Worker, Supervisor and Authority registration
+
+#### 1.6.1.1 Request
+
+```http
+POST /api/auth/forgot-password
+```
+
+#### 1.6.1.2 Request Body
+
+| Field | Type  | Description                               |
+| ----- | ----- | ----------------------------------------- |
+| email | email | Emails of Worker, Supervisor or authority |
+
+```json
+{
+  "email": "parthsali04@gmail.com"
+}
+```
+
+#### 1.6.1.3 Response
+
+```json
+{
+  "message": "OTP sent successfully"
+}
+```
+
+#### 1.6.2.2 Request
+
+```http
+POST /api/auth/validate-otp
+```
+
+#### 1.6.2.2 Request Body
+
+| Field | Type   | Description |
+| ----- | ------ | ----------- |
+| email | string | Email       |
+| otp   | string | OTP         |
+
+```json
+{
+  "email": "parthsali04@gmail.com",
+  "otp": "131432"
+}
+```
+
+#### 1.6.1.3 Response
+
+```json
+{
+  "message":  "OTP validated successfully" || "OTP expired"
+}
+```
+
+#### 1.6.3.1 Request
+
+```http
+POST /api/auth/reset-password
+```
+
+#### 1.6.3.2 Request Body
+
+| Field    | Type   | Description  |
+| -------- | ------ | ------------ |
+| email    | string | Email        |
+| password | string | New Password |
+
+```json
+{
+  "email": "parthsali04@gmail.com",
+  "password": "new password"
+}
+```
+
+#### 1.6.3.3 Response
+
+```json
+{
+  "message": "Password reset successfully"
+}
+```
+
 ## 2. Sections, Forms and Questions APIs
 
 ### 2.1. Get Sections

@@ -61,13 +61,6 @@ const addForms = async (req, res) => {
       throw new Error("Section not found");
     }
 
-    // Validate forms
-    forms.forEach((form) => {
-      if (!form.title || !form.descriptionEnglish || !form.descriptionHindi) {
-        throw new Error("Form title or description not found");
-      }
-    });
-
     // Create forms
     const formsDB = forms.map((form) => {
       return new FormData({

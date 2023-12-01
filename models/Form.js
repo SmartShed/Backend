@@ -1,12 +1,12 @@
 const mongoose = require("mongoose");
 
 const formSchema = new mongoose.Schema({
-  locoName: { type: String, required: true },
-  locoNumber: { type: String, required: true },
+  locoName: { type: String, default: "" },
+  locoNumber: { type: String, default: "" },
   formID: { type: mongoose.Types.ObjectId, ref: "FormData" },
   title: { type: String, required: true },
-  descriptionHindi: { type: String, required: true },
-  descriptionEnglish: { type: String, required: true },
+  descriptionHindi: { type: String, default: "" },
+  descriptionEnglish: { type: String, default: "" },
   questions: [{ type: mongoose.Types.ObjectId, ref: "Question" }],
   subForms: [{ type: mongoose.Types.ObjectId, ref: "SubForm" }],
   submittedCount: { type: Number, default: 0 },

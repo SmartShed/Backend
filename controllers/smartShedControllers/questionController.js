@@ -6,17 +6,17 @@ const addQuestion = async (req, res) => {
   try {
     let { textEnglish, textHindi, ansType, formID, subFormID } = req.body;
 
+    console.log(req.body);
+
     if (textEnglish) textEnglish = textEnglish.trim();
     if (textHindi) textHindi = textHindi.trim();
     if (ansType) ansType = ansType.trim();
     if (formID) formID = formID.trim();
     if (subFormID) subFormID = subFormID.trim();
 
-    let isSubForm;
+    console.log({ textEnglish, textHindi, ansType, formID, subFormID });
 
-    if (!englishText || !hindiText || !ansType) {
-      throw new Error("Question details not found");
-    }
+    let isSubForm;
 
     // If formID and subFormID both are present, set isSubForm to true
     if (formID && subFormID) {
@@ -137,13 +137,6 @@ const addQuestions = async (req, res) => {
       if (!subForm) {
         throw new Error("SubForm not found");
       }
-
-      // Validate questions
-      questions.forEach((question) => {
-        if (!question.textEnglish || !question.textHindi || !question.ansType) {
-          throw new Error("Question details not found");
-        }
-      });
 
       // Add questions
       const newQuestions = [];

@@ -30,34 +30,38 @@ const otpEmailTemplate = `
 
 
 const sendMail = (otpData) => {
-
+    console.log(otpData);
     let mailTransporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
-            user: "parthsali04@gmail.com",
-            pass: "gnbw bzei phdo srgu"
+            user: "smartshedteam@gmail.com",
+            pass: "cidx rouo rzao yjhi"
         }
     });
+
+
 
     const emailBody = otpEmailTemplate.replace("[Your OTP Code]", otpData.otp).replace("[email]", otpData.email);
 
 
     let mailDetails = {
-        from: EMAIL,
+        from: "smartshedteam@gmail.com",
         to: otpData.email,
         subject: 'Forgot Password',
         text: `Your OTP is ${otpData.otp}`,
         html: emailBody
     };
 
+
     mailTransporter.sendMail(mailDetails, function (err, data) {
         if (err) {
-
-            res.json({ message: 'Something went wrong. Please try later' });
+            console.log('Error Occurs');
+            return -1;
         } else {
-
-            res.json({ message: 'Email sent successfully' });
+            console.log('Email sent successfully');
+            return 1;
         }
+
     });
 };
 

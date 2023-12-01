@@ -341,7 +341,8 @@ const forgotPassword = async (req, res) => {
 
     await newOtp.save();
 
-    sendMail(newOtp);
+    await sendMail(newOtp);
+
 
     res.status(200).json({ message: "OTP sent successfully" });
 

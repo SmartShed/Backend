@@ -278,7 +278,7 @@ POST /api/auth/validate-otp
 
 ```json
 {
-  "message":  "OTP validated successfully" || "OTP expired"
+  "message":  "OTP validated successfully" | "OTP expired"
 }
 ```
 

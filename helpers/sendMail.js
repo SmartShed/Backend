@@ -2,7 +2,7 @@ const { EMAIL, PASSWORD } = require('../config');
 const nodemailer = require('nodemailer');
 
 const otpEmailTemplate = `
-<!DOCTYPE html>
+<!DOCTYPE html>ww
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -52,10 +52,10 @@ const sendMail = (otpData) => {
 
     mailTransporter.sendMail(mailDetails, function (err, data) {
         if (err) {
-            console.log(err);
+
             res.json({ message: 'Something went wrong. Please try later' });
         } else {
-            console.log('Email sent successfully');
+
             res.json({ message: 'Email sent successfully' });
         }
     });

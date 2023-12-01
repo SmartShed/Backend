@@ -148,7 +148,6 @@ const register = async (req, res) => {
 };
 
 const logout = async (req, res) => {
-  console.log(req.headers);
 
   try {
     validateRequest(req.headers, logoutSchema);
@@ -355,7 +354,7 @@ const forgotPassword = async (req, res) => {
 
 const validateOTP = async (req, res) => {
   try {
-    console.log(req.body);
+
     const { email, otp } = req.body;
 
     const otpInstance = await Otp.findOne({ email, otp });
@@ -377,7 +376,7 @@ const validateOTP = async (req, res) => {
 
 
 const resetPassword = async (req, res) => {
-  console.log(req.body);
+
   const { email, password } = req.body;
 
   try {

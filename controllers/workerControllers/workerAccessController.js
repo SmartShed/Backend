@@ -33,17 +33,23 @@ const getRecentForms = async (req, res) => {
 
     const formIds = user.forms;
 
-    let forms = await Form.find({ _id: { $in: formIds } }).sort({
-      updatedAt: -1,
-    });
+    let forms = await Form.find({ _id: { $in: formIds } })
+      .sort({
+        updatedAt: -1,
+      })
+      .populate("createdBy");
 
     forms = forms.map((form) => {
       return {
         id: form._id,
         title: form.title,
-        description: form.description,
+        locoName: form.locoName,
+        locoNumber: form.locoNumber,
+        descriptionEnglish: form.descriptionEnglish,
+        descriptionHindi: form.descriptionHindi,
         createdAt: form.createdAt,
         updatedAt: form.updatedAt,
+        createdBy: form.createdBy.name,
         lockStatus: form.lockStatus,
       };
     });
@@ -109,7 +115,10 @@ const getOpenedFormsBySection = async (req, res) => {
 
     const formIds = Section.forms;
 
-    forms = await Form.findMany({ _id: { $in: formIds }, lockStatus: false })
+    let forms = await Form.findMany({
+      _id: { $in: formIds },
+      lockStatus: false,
+    })
       .sort({ createdAt: -1 })
       .limit(5);
 

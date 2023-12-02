@@ -148,7 +148,6 @@ const register = async (req, res) => {
 };
 
 const logout = async (req, res) => {
-
   try {
     validateRequest(req.headers, logoutSchema);
 
@@ -311,6 +310,7 @@ const me = async (req, res) => {
       email: user.email,
       name: user.name,
       position: user.position,
+      forms: user.forms,
     });
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -343,19 +343,14 @@ const forgotPassword = async (req, res) => {
 
     await sendMail(newOtp);
 
-
     res.status(200).json({ message: "OTP sent successfully" });
-
-  }
-  catch (err) {
+  } catch (err) {
     res.status(400).json({ message: err.message });
-
   }
-}
+};
 
 const validateOTP = async (req, res) => {
   try {
-
     const { email, otp } = req.body;
 
     const otpInstance = await Otp.findOne({ email, otp });
@@ -369,22 +364,22 @@ const validateOTP = async (req, res) => {
     }
 
     res.status(200).json({ message: "OTP validated successfully" });
-
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
-}
-
+};
 
 const resetPassword = async (req, res) => {
-
   const { email, password } = req.body;
 
   try {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const user = await User.findOneAndUpdate({ email }, { password: hashedPassword });
+    const user = await User.findOneAndUpdate(
+      { email },
+      { password: hashedPassword }
+    );
 
     if (!user) {
       return res.status(400).json({ message: "User not found" });
@@ -392,17 +387,11 @@ const resetPassword = async (req, res) => {
 
     await AuthToken.deleteMany({ user: user._id });
 
-
     res.status(200).json({ message: "Password reset successfully" });
-
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
-}
-
-
-
-
+};
 
 module.exports = {
   login,
@@ -414,5 +403,5 @@ module.exports = {
   me,
   forgotPassword,
   validateOTP,
-  resetPassword
+  resetPassword,
 };

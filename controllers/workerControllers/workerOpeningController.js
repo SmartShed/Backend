@@ -7,34 +7,33 @@ const User = require("../../models/User");
 const SubFormData = require("../../models/SubFormData");
 const SubForm = require("../../models/SubForm");
 
-
-
 const createForm = async (req, res) => {
-  const form_id = req.params.form_id;
+  // const form_id = req.params.form_id;
   const auth_token = req.headers.auth_token;
 
-  const { loconame, loconumber } = req.body;
-
+  const { form_id, loco_name, loco_number } = req.body;
 
   try {
     // find user using auth_token
 
-    let user = await AuthToken.findOne({ token: auth_token }, { user: 1 }).populate("user");
+    let user = await AuthToken.findOne(
+      { token: auth_token },
+      { user: 1 }
+    ).populate("user");
     user = user.user;
-
-
 
     if (!user) {
       res.status(400).json({ message: "User does not exist" });
       return;
     }
 
-    const formdata = await FormData.findById(form_id).populate("questions").populate("subForms").populate("subForms.questions");
+    const formdata = await FormData.findById(form_id)
+      .populate("questions")
+      .populate("subForms")
+      .populate("subForms.questions");
 
     const questions = formdata.questions;
     const subforms = formdata.subForms;
-
-
 
     // creating questions for subforms
     let subformsData = [];
@@ -42,7 +41,9 @@ const createForm = async (req, res) => {
 
     for (let i = 0; i < subforms.length; i++) {
       let subformQuestions = [];
-      const subform = await SubFormData.findById(subforms[i]._id).populate("questions");
+      const subform = await SubFormData.findById(subforms[i]._id).populate(
+        "questions"
+      );
 
       let questionIDs = [];
       for (let j = 0; j < subform.questions.length; j++) {
@@ -111,45 +112,48 @@ const createForm = async (req, res) => {
       questionIDs.push(questionsData[i]._id);
     }
 
-
-
-
     // creating questions for form
     const newForm = new Form({
-      locoName: loconame,
-      locoNumber: loconumber,
+      locoName: loco_name,
+      locoNumber: loco_number,
       formID: formdata._id,
       title: formdata.title,
-      description: formdata.description,
+      descriptionEnglish: formdata.descriptionEnglish,
+      descriptionHindi: formdata.descriptionHindi,
       questions: questionIDs,
       subForms: subformsIDs,
       history: [],
       lockStatus: false,
       createdBy: user._id,
       updatedBy: user._id,
-      access: [user._id]
+      access: [user._id],
     });
 
     await newForm.save();
 
-    const resForm = {
-      formID: formdata._id,
-      _id: newForm._id,
-      name: formdata.title,
-      description: formdata.description,
-      status: false,
-      created_at: newForm.createdAt,
-      updatedAt: newForm.updatedAt,
-      questions: questionsData,
-      subForms: subformsData,
-    };
+    user.forms.push(newForm._id);
 
-    res.status(201).json({ message: "Form created successfully", form: resForm });
+    await user.save();
+
+    // const resForm = {
+    //   formID: formdata._id,
+    //   newFormID: newForm._id,
+    //   name: formdata.title,
+    //   description: formdata.description,
+    //   status: false,
+    //   created_at: newForm.createdAt,
+    //   updatedAt: newForm.updatedAt,
+    //   questions: questionsData,
+    //   subForms: subformsData,
+    // };
+
+    res
+      .status(201)
+      .json({ message: "Form created successfully", newFormID: newForm._id });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
-
 
 const getForm = async (req, res) => {
   try {
@@ -157,8 +161,7 @@ const getForm = async (req, res) => {
 
     console.log("form_id", form_id);
 
-    const form = await Form
-      .findById(form_id)
+    const form = await Form.findById(form_id)
       .populate("questions")
       .populate({
         path: "subForms",
@@ -173,7 +176,6 @@ const getForm = async (req, res) => {
     }
 
     return res.status(200).json({ form: form });
-
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: error.message });
@@ -183,7 +185,6 @@ const getForm = async (req, res) => {
 const getAnswer = async (req, res) => {
   const form_id = req.params.form_id;
   const question_id = req.params.question_id;
-
 
   try {
     const form = await Form.findById(form_id);
@@ -200,14 +201,12 @@ const getAnswer = async (req, res) => {
       });
     }
 
-
     let questionHistory = null;
     for (let i = 0; i < form.history.length; i++) {
       if (form.history[i].changes.questionID == question._id) {
         questionHistory = form.history[i];
       }
     }
-
 
     if (!questionHistory) {
       return res.status(200).json({
@@ -225,8 +224,6 @@ const getAnswer = async (req, res) => {
 
     const user = await User.findById(questionHistory.editedBy);
 
-
-
     return res.status(200).json({
       message: "Answer retrieved successfully",
       answer: {
@@ -238,9 +235,6 @@ const getAnswer = async (req, res) => {
         },
       },
     });
-
-
-
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -251,14 +245,13 @@ const getAnswerOfForm = async (req, res) => {
   console.log("form_id", form_id);
 
   try {
-    const form = await Form.findById(form_id).populate("questions").populate("subForms");
+    const form = await Form.findById(form_id)
+      .populate("questions")
+      .populate("subForms");
     if (!form) {
       res.status(400).json({ message: "Form does not exist" });
       return;
     }
-
-
-
 
     res.status(201).json({
       message: "Answers retrieved successfully",
@@ -271,5 +264,7 @@ const getAnswerOfForm = async (req, res) => {
 
 module.exports = {
   createForm,
-  getForm, getAnswer, getAnswerOfForm
+  getForm,
+  getAnswer,
+  getAnswerOfForm,
 };

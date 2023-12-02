@@ -8,7 +8,7 @@ const {
 } = require("../controllers/workerControllers/workerAccessController");
 
 const {
-  // createForm,
+  createForm,
   getForm,
   getAnswer,
   getAnswerOfForm,
@@ -22,12 +22,12 @@ const {
 // Form Access APIs
 router.get("/forms", getRecentForms);
 
-router.get("/sections/:section_id/forms", getRecentFormsBySection);
+router.get("/section/:section_id/forms", getRecentFormsBySection);
 
-router.get("sections/:section_id/opened-forms", getOpenedFormsBySection);
+router.get("section/:section_id/opened-forms", getOpenedFormsBySection);
 
 // Worker Opening APIs
-// router.post("/forms/new/:form_id", createForm);
+router.post("/forms/create", createForm);
 
 router.get("/forms/:form_id", getForm);
 

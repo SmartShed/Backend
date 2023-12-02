@@ -7,103 +7,130 @@ const User = require("../../models/User");
 
 
 
-// const createForm = async (req, res) => {
-//   const form_id = req.params.form_id;
-//   const auth_token = req.headers.auth_token;
+const createForm = async (req, res) => {
+  const form_id = req.params.form_id;
+  const auth_token = req.headers.auth_token;
 
-//   console.log("form_id", form_id);
-//   console.log("auth_token", auth_token);
+  const { loconame, loconumber } = req.body;
 
-//   try {
-//     // find user using auth_token
+  console.log("form_id", form_id);
+  console.log("auth_token", auth_token);
 
-//     const user = await AuthToken.findOne({ token: auth_token }, { user: 1 }).populate("user");
+  try {
+    // find user using auth_token
 
-//     console.log("user", user);
+    const user = await AuthToken.findOne({ token: auth_token }, { user: 1 }).populate("user");
 
-//     if (!user) {
-//       res.status(400).json({ message: "User does not exist" });
-//       return;
-//     }
+    console.log("user", user);
 
-//     const formdata = await FormData.findById(form_id).populate("questions").populate("subForms");
+    if (!user) {
+      res.status(400).json({ message: "User does not exist" });
+      return;
+    }
 
-//     const questions = formdata.questions;
-//     const subforms = formdata.subForms;
+    const formdata = await FormData.findById(form_id).populate("questions").populate("subForms");
+
+    const questions = formdata.questions;
+    const subforms = formdata.subForms;
 
 
-//     let newQuestions = [];
-//     for (let i = 0; i < questions.length; i++) {
-//       const question = questions[i];
+    let newQuestions = [];
+    let question_ids = [];
+    for (let i = 0; i < questions.length; i++) {
+      const question = questions[i];
 
-//       const newQuestion = await Question.create({
-//         questionID: question._id,
-//         textEnglish: question.textEnglish,
-//         textHindi: question.textHindi,
-//         ansType: question.ansType,
-//         isAnswered: false,
-//         ans: null,
-//       });
+      const newQuestion = await Question.create({
+        questionID: question._id,
+        textEnglish: question.textEnglish,
+        textHindi: question.textHindi,
+        ansType: question.ansType,
+        isAnswered: false,
+        ans: null,
+      });
 
-//       await newQuestion.save();
+      await newQuestion.save();
 
-//       newQuestions.push({
-//         "_id": newQuestion._id,
-//         "textEnglish": newQuestion.textEnglish,
-//         "textHindi": newQuestion.textHindi,
-//         "ansType": newQuestion.ansType,
-//       });
-//     }
+      question_ids.push(newQuestion._id);
 
-//     let newSubForms = [];
-//     for (let i = 0; i < subforms.length; i++) {
-//       const subform = subforms[i];
+      newQuestions.push({
+        "_id": newQuestion._id,
+        "textEnglish": newQuestion.textEnglish,
+        "textHindi": newQuestion.textHindi,
+        "ansType": newQuestion.ansType,
+      });
+    }
 
-//       for(let i=0; i<subform.questions.length; i++) {
-//         const question_id = subform.questions[i];
+    let newSubForms = [];
+    for (let i = 0; i < subforms.length; i++) {
+      const subform = subforms[i];
 
-//         const question = await QuestionData.findById(question_id);
-
-//         const newQuestion = await Question.create({
-//           questionID: question._id,
-//           textEnglish: question.textEnglish,
-//           textHindi: question.textHindi,
-//           ansType: question.ansType,
-//           isAnswered: false,
-//           ans: null,
-//         });
-
-//         await newQuestion.save();
+      let questions = [];
+      let question_ids = [];
 
 
 
+      for (let i = 0; i < subform.questions.length; i++) {
+        const question_id = subform.questions[i];
+        const question = await QuestionData.findById(question_id);
+        const newQuestion = await Question.create({
+          questionID: question._id,
+          textEnglish: question.textEnglish,
+          textHindi: question.textHindi,
+          ansType: question.ansType,
+          isAnswered: false,
+          ans: null,
+        });
+        await newQuestion.save();
+
+        question_ids.push(newQuestion._id);
+
+
+        questions.push({
+          "_id": newQuestion._id,
+          "textEnglish": newQuestion.textEnglish,
+          "textHindi": newQuestion.textHindi,
+          "ansType": newQuestion.ansType,
+        });
+
+      }
+
+      const newSubForm = await SubForm.create({
+        title: subform.title,
+        titleHindi: subform.titleHindi,
+        titleEnglish: subform.titleEnglish,
+        note: subform.note,
+        questions: question_ids,
+      });
+
+      await newSubForm.save();
+    }
+
+
+    const form = await Form.create({
+      locoName: loconame,
+      locoNumber: loconumber,
+      formID: formdata._id,
+      title: formdata.title,
+      descriptionHindi: formdata.titleHindi,
+      descriptionEnglish: formdata.titleEnglish,
+      questions: formdata.questions,
+      subForms: formdata.subForms,
+      sectionID: formdata.sectionID,
+      createdBy: user.user._id,
+    });
+
+  }
 
 
 
 
 
-//     if (!formdata) {
-//       res.status(400).json({ message: "Form does not exist" });
-//       return;
-//     }
-
-//     const form = await Form.create({
-//       formID: formdata._id,
-//       title: formdata.title,
-//       description: formdata.descriptionEnglish,
-//       questions: formdata.questions,
-//       subForms: formdata.subForms,
-//       sectionID: formdata.sectionID,
-//       createdBy: user.user._id,
-//     });
 
 
-//   }
-
-//   catch (err) {
-//     res.status(500).json({ message: "Form creation failed" });
-//   }
-// };
+  catch (err) {
+    res.status(500).json({ message: "Form creation failed" });
+  }
+};
 
 
 const getForm = async (req, res) => {

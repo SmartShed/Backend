@@ -8,6 +8,11 @@ const QuestionData = require("./models/QuestionData");
 const SectionData = require("./models/SectionData");
 const FormData = require("./models/FormData");
 
+const Form = require("./models/Form");
+
+const SubForm = require("./models/SubForm");
+const Question = require("./models/Question");
+
 const { APP_PORT } = require("./config");
 const connectDB = require("./config/database");
 
@@ -18,6 +23,7 @@ const {
   sectionRoutes,
   smartShedRoutes,
 } = require("./routes");
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -112,6 +118,15 @@ app.post("/api/addform", async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 });
+
+app.get("/api/clear", async (req, res) => {
+  await Question.deleteMany({});
+  await SubForm.deleteMany({});
+  await Form.deleteMany({});
+
+  res.status(200).send("Cleared");
+}
+);
 
 app.listen(APP_PORT, () => {
   console.log(`Server is running on port ${APP_PORT}`);

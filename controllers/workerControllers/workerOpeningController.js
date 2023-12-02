@@ -4,6 +4,8 @@ const AuthToken = require("../../models/AuthToken");
 const Question = require("../../models/Question");
 const QuestionData = require("../../models/QuestionData");
 const User = require("../../models/User");
+const SubFormData = require("../../models/SubFormData");
+const SubForm = require("../../models/SubForm");
 
 
 
@@ -13,66 +15,40 @@ const createForm = async (req, res) => {
 
   const { loconame, loconumber } = req.body;
 
-  console.log("form_id", form_id);
-  console.log("auth_token", auth_token);
 
   try {
     // find user using auth_token
 
-    const user = await AuthToken.findOne({ token: auth_token }, { user: 1 }).populate("user");
+    let user = await AuthToken.findOne({ token: auth_token }, { user: 1 }).populate("user");
+    user = user.user;
 
-    console.log("user", user);
+
 
     if (!user) {
       res.status(400).json({ message: "User does not exist" });
       return;
     }
 
-    const formdata = await FormData.findById(form_id).populate("questions").populate("subForms");
+    const formdata = await FormData.findById(form_id).populate("questions").populate("subForms").populate("subForms.questions");
 
     const questions = formdata.questions;
     const subforms = formdata.subForms;
 
 
-    let newQuestions = [];
-    let question_ids = [];
-    for (let i = 0; i < questions.length; i++) {
-      const question = questions[i];
 
-      const newQuestion = await Question.create({
-        questionID: question._id,
-        textEnglish: question.textEnglish,
-        textHindi: question.textHindi,
-        ansType: question.ansType,
-        isAnswered: false,
-        ans: null,
-      });
+    // creating questions for subforms
+    let subformsData = [];
+    let subformsIDs = [];
 
-      await newQuestion.save();
-
-      question_ids.push(newQuestion._id);
-
-      newQuestions.push({
-        "_id": newQuestion._id,
-        "textEnglish": newQuestion.textEnglish,
-        "textHindi": newQuestion.textHindi,
-        "ansType": newQuestion.ansType,
-      });
-    }
-
-    let newSubForms = [];
     for (let i = 0; i < subforms.length; i++) {
-      const subform = subforms[i];
+      let subformQuestions = [];
+      const subform = await SubFormData.findById(subforms[i]._id).populate("questions");
 
-      let questions = [];
-      let question_ids = [];
+      let questionIDs = [];
+      for (let j = 0; j < subform.questions.length; j++) {
+        const question = subform.questions[j];
 
-
-
-      for (let i = 0; i < subform.questions.length; i++) {
-        const question_id = subform.questions[i];
-        const question = await QuestionData.findById(question_id);
-        const newQuestion = await Question.create({
+        subformQuestions.push({
           questionID: question._id,
           textEnglish: question.textEnglish,
           textHindi: question.textHindi,
@@ -80,96 +56,127 @@ const createForm = async (req, res) => {
           isAnswered: false,
           ans: null,
         });
-        await newQuestion.save();
-
-        question_ids.push(newQuestion._id);
-
-
-        questions.push({
-          "_id": newQuestion._id,
-          "textEnglish": newQuestion.textEnglish,
-          "textHindi": newQuestion.textHindi,
-          "ansType": newQuestion.ansType,
-        });
-
       }
 
-      const newSubForm = await SubForm.create({
-        title: subform.title,
+      subformQuestions = await Question.insertMany(subformQuestions);
+
+      for (let j = 0; j < subformQuestions.length; j++) {
+        questionIDs.push(subformQuestions[j]._id);
+      }
+
+      const newSubform = new SubForm({
+        subFormID: subform._id,
         titleHindi: subform.titleHindi,
         titleEnglish: subform.titleEnglish,
         note: subform.note,
-        questions: question_ids,
+        questions: questionIDs,
+        formID: formdata._id,
       });
 
-      await newSubForm.save();
+      await newSubform.save();
+
+      subformsIDs.push(newSubform._id);
+
+      subformsData.push({
+        subFormID: subform._id,
+        _id: newSubform._id,
+        titleHindi: subform.titleHindi,
+        titleEnglish: subform.titleEnglish,
+        note: subform.note,
+        questions: subformQuestions,
+        formID: subform.formID,
+      });
+    }
+
+    // creating questions for form
+    let questionsData = [];
+    let questionIDs = [];
+
+    for (let i = 0; i < questions.length; i++) {
+      const question = questions[i];
+
+      questionsData.push({
+        questionID: question._id,
+        textEnglish: question.textEnglish,
+        textHindi: question.textHindi,
+        ansType: question.ansType,
+        isAnswered: false,
+        ans: null,
+      });
+    }
+
+    questionsData = await Question.insertMany(questionsData);
+
+    for (let i = 0; i < questionsData.length; i++) {
+      questionIDs.push(questionsData[i]._id);
     }
 
 
-    const form = await Form.create({
+
+
+    // creating questions for form
+    const newForm = new Form({
       locoName: loconame,
       locoNumber: loconumber,
       formID: formdata._id,
       title: formdata.title,
-      descriptionHindi: formdata.titleHindi,
-      descriptionEnglish: formdata.titleEnglish,
-      questions: formdata.questions,
-      subForms: formdata.subForms,
-      sectionID: formdata.sectionID,
-      createdBy: user.user._id,
+      description: formdata.description,
+      questions: questionIDs,
+      subForms: subformsIDs,
+      history: [],
+      lockStatus: false,
+      createdBy: user._id,
+      updatedBy: user._id,
+      access: [user._id]
     });
 
-  }
+    await newForm.save();
 
+    const resForm = {
+      formID: formdata._id,
+      _id: newForm._id,
+      name: formdata.title,
+      description: formdata.description,
+      status: false,
+      created_at: newForm.createdAt,
+      updatedAt: newForm.updatedAt,
+      questions: questionsData,
+      subForms: subformsData,
+    };
 
-
-
-
-
-
-  catch (err) {
-    res.status(500).json({ message: "Form creation failed" });
+    res.status(201).json({ message: "Form created successfully", form: resForm });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };
 
 
 const getForm = async (req, res) => {
-  // form_id is mongo id
-  const form_id = req.params.form_id;
-
-  // const auth_token = req.headers.auth_token;
-
   try {
-    const form = await Form.findOne({ _id: form_id });
+    const form_id = req.params.form_id;
 
-    let questionsData = [];
+    console.log("form_id", form_id);
 
-    for (let i = 0; i < form.questions.length; i++) {
-      const question = await Question.findOne({ _id: form.questions[i] });
-      questionsData.push({
-        _id: question._id,
-        questionID: question.questionID,
-        questionText: question.questionText,
-        ansType: question.ansType,
-        isAnswered: question.isAnswered,
+    const form = await Form
+      .findById(form_id)
+      .populate("questions")
+      .populate({
+        path: "subForms",
+        populate: {
+          path: "questions",
+          model: "Question", // Replace with the actual model name for questions
+        },
       });
+
+    if (!form) {
+      return res.status(404).json({ error: "Form not found" });
     }
 
-    res.status(200).json({
-      message: "Form retrieved successfully",
-      form: {
-        formID: form.formID,
-        _id: form._id,
-        name: form.title,
-        description: form.description,
-        status: form.lockStatus,
-        created_at: form.createdAt,
-        updatedAt: form.updatedAt,
-      },
-      questions: questionsData,
-    });
-  } catch (err) {
-    res.status(500).json({ message: "Form retrieval failed" });
+    return res.status(200).json({ form: form });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -177,113 +184,92 @@ const getAnswer = async (req, res) => {
   const form_id = req.params.form_id;
   const question_id = req.params.question_id;
 
-  console.log("form_id", form_id);
-  console.log("question_id", question_id);
-
-  // const auth_token = req.headers.auth_token;
 
   try {
-    const form = await Form.findOne({ _id: form_id });
+    const form = await Form.findById(form_id);
 
     if (!form) {
       res.status(400).json({ message: "Form does not exist" });
       return;
     }
 
-    let question = await Question.findOne({ _id: question_id });
-
+    let question = await Question.findById(question_id);
     if (!question) {
-      res.status(400).json({
+      return res.status(400).json({
         message: "Question does not exist",
       });
-      return;
     }
 
+
+    let questionHistory = null;
     for (let i = 0; i < form.history.length; i++) {
       if (form.history[i].changes.questionID == question._id) {
-        const questionHistory = form.history[i];
-
-        const user = await User.findOne({ _id: questionHistory.editedBy });
-
-        res.status(201).json({
-          message: "Answer retrieved successfully",
-          answer: question.ans,
-          answer_by: {
-            name: user.name,
-            edited_at: questionHistory.editedAt,
-          },
-        });
+        questionHistory = form.history[i];
       }
     }
 
-    res.status(201).json({
-      message: "Answer retrieved successfully",
-      answer: question.ans,
-      answer_by: {
-        name: "Not available",
-        edited_at: "Not available",
-      },
-    });
-  } catch (err) {
-    res.status(500).json({ message: "Answer retrieval failed" });
-  }
-};
 
-const getAnswerOfForm = async (req, res) => {
-  const form_id = req.params.form_id;
-  console.log("form_id", form_id);
-  // const auth_token = req.headers.auth_token;
-
-  try {
-    const form = await Form.findOne({ _id: form_id });
-
-    if (!form) {
-      res.status(400).json({ message: "Form does not exist" });
-      return;
-    }
-
-    let answers = [];
-    for (let i = 0; i < form.questions.length; i++) {
-      const question = await Question.findOne({ _id: form.questions[i] });
-
-      let questionHistory = null;
-      for (let j = 0; j < form.history.length; j++) {
-        if (form.history[j].changes.questionID == question._id) {
-          questionHistory = form.history[j];
-        }
-      }
-
-      if (!questionHistory) {
-        answers.push({
+    if (!questionHistory) {
+      return res.status(200).json({
+        message: "Answer retrieved successfully",
+        answer: {
           question_id: question._id,
           answer: question.ans,
           answer_by: {
             name: "Not available",
             edited_at: "Not available",
           },
-        });
-        continue;
-      }
+        },
+      });
+    }
 
-      const user = await User.findOne({ _id: questionHistory.editedBy });
+    const user = await User.findById(questionHistory.editedBy);
 
-      answers.push({
+
+
+    return res.status(200).json({
+      message: "Answer retrieved successfully",
+      answer: {
         question_id: question._id,
         answer: question.ans,
         answer_by: {
           name: user.name,
           edited_at: questionHistory.editedAt,
         },
-      });
+      },
+    });
+
+
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const getAnswerOfForm = async (req, res) => {
+  const form_id = req.params.form_id;
+  console.log("form_id", form_id);
+
+  try {
+    const form = await Form.findById(form_id).populate("questions").populate("subForms");
+    if (!form) {
+      res.status(400).json({ message: "Form does not exist" });
+      return;
     }
+
+
+
 
     res.status(201).json({
       message: "Answers retrieved successfully",
-      answers: answers,
+      answers: form,
     });
   } catch (err) {
     res.status(500).json({ message: "Answers retrieval failed" });
   }
 };
 
-module.exports = { getForm, getAnswer, getAnswerOfForm };
+module.exports = {
+  createForm,
+  getForm, getAnswer, getAnswerOfForm
+};

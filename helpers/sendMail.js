@@ -3,49 +3,12 @@ const nodemailer = require("nodemailer");
 const fs = require("fs");
 const path = require("path");
 
-// const otpEmailTemplate = `
-// <!DOCTYPE html>
-// <html lang="en">
-// <head>
-//     <meta charset="UTF-8">
-//     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-//     <title>SmartShed Forgot Password OTP</title>
-// </head>
-// <body style="font-family: Arial, sans-serif;">
-
-//     <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ccc;">
-
-//         <h2>SmartShed Forgot Password OTP</h2>
-
-//         <br>
-
-//         <p>Dear user [email],</p>
-
-//         <br>
-
-//         <p>Your One Time Password (OTP) for SmartShed is <strong>[Your OTP Code]</strong></p>
-//         <p>Please use this code to reset your password.</p>
-
-//         <br>
-//         <br>
-
-//         <p>Regards,</p>
-//         <p>Thank you,</p>
-//         <p>Team SmartShed</p>
-
-//     </div>
-
-// </body>
-// </html>
-// `;
-
 const otpEmailTemplate = fs.readFileSync(
   path.resolve(__dirname, "otpEmailTemplate.html"),
   { encoding: "utf-8" }
 );
 
-const sendMail = (otpData) => {
-  console.log(otpData);
+const sendMail = (userName, userEmail, otp) => {
   let mailTransporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -55,25 +18,26 @@ const sendMail = (otpData) => {
   });
 
   const emailBody = otpEmailTemplate
-    .replace("$$EMAIL$$", otpData.email)
-    .replace("$$OTP$$", otpData.otp);
+    .replace("$$NAME$$", userName)
+    .replace("$$EMAIL$$", userEmail)
+    .replace("$$OTP$$", otp);
 
   let mailDetails = {
     from: "smartshedteam@gmail.com",
-    to: otpData.email,
+    to: userEmail,
     subject: "SmartShed Forgot Password OTP",
-    text: `Your One Time Password (OTP) for SmartShed is ${otpData.otp}. Please use this code to reset your password.`,
+    text: `Your One Time Password (OTP) for SmartShed is ${otp}. Please use this code to reset your password.`,
     html: emailBody,
   };
 
-  mailTransporter.sendMail(mailDetails, function (err, data) {
-    if (err) {
-      console.log("Error Occurs " + err);
-      return -1;
-    } else {
-      console.log("Email sent successfully");
-      return 1;
-    }
+  return new Promise((resolve, reject) => {
+    mailTransporter.sendMail(mailDetails, function (err, data) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
   });
 };
 

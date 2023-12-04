@@ -320,17 +320,14 @@ const me = async (req, res) => {
 const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
-
-    console.log(email);
+    await Otp.deleteMany({ expireAt: { $lt: Date.now() } });
 
     const user = await User.findOne({ email });
-
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
 
     await AuthToken.deleteMany({ user: user._id });
-
     const otp = Math.floor(100000 + Math.random() * 100000);
 
     const newOtp = new Otp({
@@ -341,7 +338,12 @@ const forgotPassword = async (req, res) => {
 
     await newOtp.save();
 
-    await sendMail(newOtp);
+    const emailResponse = await sendMail(user.name, email, otp);
+
+    if (emailResponse === -1) {
+      await Otp.deleteOne({ otp });
+      return res.status(400).json({ message: "Error sending email" });
+    }
 
     res.status(200).json({ message: "OTP sent successfully" });
   } catch (err) {
@@ -352,6 +354,7 @@ const forgotPassword = async (req, res) => {
 const validateOTP = async (req, res) => {
   try {
     const { email, otp } = req.body;
+    await Otp.deleteMany({ expireAt: { $lt: Date.now() } });
 
     const otpInstance = await Otp.findOne({ email, otp });
 

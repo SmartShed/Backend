@@ -135,21 +135,23 @@ const createForm = async (req, res) => {
 
     await user.save();
 
-    // const resForm = {
-    //   formID: formdata._id,
-    //   newFormID: newForm._id,
-    //   name: formdata.title,
-    //   description: formdata.description,
-    //   status: false,
-    //   created_at: newForm.createdAt,
-    //   updatedAt: newForm.updatedAt,
-    //   questions: questionsData,
-    //   subForms: subformsData,
-    // };
+    const resForm = {
+      id: newForm._id,
+      title: newForm.title,
+      descriptionEnglish: newForm.descriptionEnglish,
+      descriptionHindi: newForm.descriptionHindi,
+      locoName: newForm.locoName,
+      locoNumber: newForm.locoNumber,
+      createdAt: newForm.createdAt,
+      updatedAt: newForm.updatedAt,
+      createdBy: user.name,
+      lockStatus: newForm.lockStatus,
+    };
 
-    res
-      .status(201)
-      .json({ message: "Form created successfully", newFormID: newForm._id });
+    res.status(201).json({
+      message: "Form created successfully",
+      form: resForm,
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -159,8 +161,6 @@ const getForm = async (req, res) => {
   try {
     const form_id = req.params.form_id;
 
-    console.log("form_id", form_id);
-
     const form = await Form.findById(form_id)
       .populate("questions")
       .populate({
@@ -169,16 +169,23 @@ const getForm = async (req, res) => {
           path: "questions",
           model: "Question", // Replace with the actual model name for questions
         },
-      });
+      })
+      .populate("createdBy");
 
     if (!form) {
-      return res.status(404).json({ error: "Form not found" });
+      return res.status(404).json({ message: "Form not found" });
     }
 
-    return res.status(200).json({ form: form });
+    return res.status(200).json({
+      message: "Form retrieved successfully",
+      form: {
+        ...form._doc,
+        createdBy: form.createdBy.name,
+      },
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 

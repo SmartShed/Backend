@@ -81,6 +81,12 @@ const login = async (req, res) => {
     res.status(200).json({
       auth_token,
       message: "Login successful",
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        position: user.position,
+      },
     });
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -141,6 +147,12 @@ const register = async (req, res) => {
     res.status(201).json({
       auth_token: token,
       message: "Registration successful",
+      user: {
+        id: newUser._id,
+        email: newUser.email,
+        name: newUser.name,
+        position: newUser.position,
+      },
     });
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -155,7 +167,7 @@ const logout = async (req, res) => {
 
     const authToken = await AuthToken.findOne({ token: auth_token });
 
-    const deleteToken = await AuthToken.deleteOne(authToken);
+    await AuthToken.deleteOne(authToken);
 
     res.status(200).json({
       message: "Logout successful",
@@ -189,6 +201,12 @@ const googleLogin = async (req, res) => {
     res.status(200).json({
       auth_token,
       message: "Login successful",
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        position: user.position,
+      },
     });
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -245,6 +263,12 @@ const googleRegister = async (req, res) => {
     res.status(201).json({
       auth_token: token,
       message: "Registration successful",
+      user: {
+        id: newUser._id,
+        email: newUser.email,
+        name: newUser.name,
+        position: newUser.position,
+      },
     });
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -320,7 +344,6 @@ const me = async (req, res) => {
 const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
-    await Otp.deleteMany({ expireAt: { $lt: Date.now() } });
 
     const user = await User.findOne({ email });
     if (!user) {

@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const { checkAuthorization } = require("../middlewares");
 
 
 
@@ -27,7 +28,7 @@ router.post("/login/google", googleLogin);
 
 router.post("/register/google", googleRegister);
 
-router.post("/addemployee", addEmployee);
+router.post("/addemployee", checkAuthorization, addEmployee);
 
 router.get("/me", me);
 

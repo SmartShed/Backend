@@ -201,11 +201,12 @@ POST /api/auth/addemployee
 
 #### 1.6.2. Request Body
 
-| Field      | Type             | Description          |
-| ---------- | ---------------- | -------------------- |
-| worker     | array of strings | Emails of Workers    |
-| supervisor | array of strings | Emails of Supervisor |
-| authority  | array of strings | Emails of Authoritys |
+| Field      | Type                                    | Description          |
+| ---------- | --------------------------------------- | -------------------- |
+| supervisor | array of strings                        | Emails of Supervisor |
+| worker     | array of strings                        | Emails of Workers    |
+| authority  | array of strings                        | Emails of Authoritys |
+| position   | "authority" OR "supervisor" OR "worker" | Position of Employee |
 
 ```json
 {

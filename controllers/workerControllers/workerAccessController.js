@@ -3,7 +3,6 @@ const Form = require("../../models/Form");
 const User = require("../../models/User");
 const SectionData = require("../../models/SectionData");
 
-
 const getRecentForms = async (req, res) => {
   try {
     const auth_token = req.headers.auth_token;
@@ -66,31 +65,33 @@ const getRecentForms = async (req, res) => {
   }
 };
 
-const getRecentFormsBySection = async (req, res) => {
-  const section_id = req.params.section_id;
+const getRecentFormsBySectionId = async (req, res) => {
+  const section_id = req.params.section_param;
 
   const auth_token = req.headers.auth_token;
 
-
-
   try {
-    const Section = await SectionData.findById(section_id);
+    const section = await SectionData.findById(section_id);
 
-    if (!Section) {
+    if (!section) {
       throw new Error("Section not found");
     }
 
-    let user = await AuthToken.findOne({ token: auth_token }, { user: 1 }).populate('user');
+    let user = await AuthToken.findOne(
+      { token: auth_token },
+      { user: 1 }
+    ).populate("user");
     user = user.user;
 
     if (!user) {
       throw new Error("User not found");
     }
 
-    const formIds = Section.forms;
+    const formIds = section.forms;
 
-    let forms = await Form.find({ formID: { $in: formIds } }).populate('createdBy');
-
+    let forms = await Form.find({ formID: { $in: formIds } }).populate(
+      "createdBy"
+    );
 
     let newForms = [];
 
@@ -98,19 +99,11 @@ const getRecentFormsBySection = async (req, res) => {
       let access = forms[j].access;
 
       for (let i = 0; i < access.length; i++) {
-
         if (access[i].equals(user._id)) {
-
           newForms.push(forms[j]);
         }
       }
     }
-
-
-
-
-
-
 
     if (!newForms.length) {
       return res.status(200).json({
@@ -123,14 +116,86 @@ const getRecentFormsBySection = async (req, res) => {
       return {
         id: newForm._id,
         title: newForm.title,
-        description: newForm.description,
+        descriptionEnglish: newForm.descriptionEnglish,
+        descriptionHindi: newForm.descriptionHindi,
+        locoName: newForm.locoName,
+        locoNumber: newForm.locoNumber,
         createdAt: newForm.createdAt,
         updatedAt: newForm.updatedAt,
         lockStatus: newForm.lockStatus,
-        createdBy: {
-          id: newForm.createdBy._id,
-          name: newForm.createdBy.name,
-        },
+        createdBy: newForm.createdBy.name,
+      };
+    });
+
+    res.status(200).json({
+      status: "success",
+      message: "Forms fetched successfully",
+      forms: newForms,
+    });
+  } catch (err) {
+    res.status(400).json({ status: "error", message: err.message });
+  }
+};
+
+const getRecentFormsBySectionName = async (req, res) => {
+  const section_name = req.params.section_param;
+
+  const auth_token = req.headers.auth_token;
+
+  try {
+    const section = await SectionData.findOne({ name: section_name });
+
+    if (!section) {
+      throw new Error("Section not found");
+    }
+
+    let user = await AuthToken.findOne(
+      { token: auth_token },
+      { user: 1 }
+    ).populate("user");
+    user = user.user;
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const formIds = section.forms;
+
+    let forms = await Form.find({ formID: { $in: formIds } }).populate(
+      "createdBy"
+    );
+
+    let newForms = [];
+
+    for (let j = 0; j < forms.length; j++) {
+      let access = forms[j].access;
+
+      for (let i = 0; i < access.length; i++) {
+        if (access[i].equals(user._id)) {
+          newForms.push(forms[j]);
+        }
+      }
+    }
+
+    if (!newForms.length) {
+      return res.status(200).json({
+        status: "success",
+        message: "No forms found",
+        forms: [],
+      });
+    }
+    newForms = newForms.map((newForm) => {
+      return {
+        id: newForm._id,
+        title: newForm.title,
+        descriptionEnglish: newForm.descriptionEnglish,
+        descriptionHindi: newForm.descriptionHindi,
+        locoName: newForm.locoName,
+        locoNumber: newForm.locoNumber,
+        createdAt: newForm.createdAt,
+        updatedAt: newForm.updatedAt,
+        lockStatus: newForm.lockStatus,
+        createdBy: newForm.createdBy.name,
         createdAt: newForm.createdAt,
       };
     });
@@ -145,60 +210,8 @@ const getRecentFormsBySection = async (req, res) => {
   }
 };
 
-const getOpenedFormsBySection = async (req, res) => {
-  const section_id = req.params.section_id;
-
-  const auth_token = req.headers.auth_token;
-
-  try {
-    const Section = await SectionData.findById(section_id);
-
-    if (!Section) {
-      throw new Error("Section not found");
-    }
-
-    const formIds = Section.forms;
-
-    let forms = await Form.find({ formID: { $in: formIds } }).populate('createdBy');
-
-    if (!forms.length) {
-      return res.status(200).json({
-        status: "success",
-        message: "No forms found",
-        forms: [],
-      });
-    }
-
-    forms = forms.map((form) => {
-      return {
-        id: form._id,
-        locoName: form.locoName,
-        locoNumber: form.locoNumber,
-        title: form.title,
-        descriptionHindi: form.descriptionHindi,
-        descriptionEnglish: form.descriptionEnglish,
-        createdAt: form.createdAt,
-        updatedAt: form.updatedAt,
-        createdBy: {
-          id: form.createdBy._id,
-          name: form.createdBy.name,
-        },
-      };
-    }
-    );
-
-    res.status(200).json({
-      status: "success",
-      message: "Forms fetched successfully",
-      forms: forms,
-    });
-  } catch (err) {
-    res.status(400).json({ status: "error", message: err.message });
-  }
-};
-
 module.exports = {
   getRecentForms,
-  getRecentFormsBySection,
-  getOpenedFormsBySection,
+  getRecentFormsBySectionId,
+  getRecentFormsBySectionName,
 };

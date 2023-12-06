@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
+const mongoose = require("mongoose");
 
 const {
   getRecentForms,
-  getRecentFormsBySection,
-  getOpenedFormsBySection,
+  getRecentFormsBySectionId,
+  getRecentFormsBySectionName,
 } = require("../controllers/workerControllers/workerAccessController");
 
 const {
@@ -22,9 +23,16 @@ const {
 // Form Access APIs
 router.get("/forms", getRecentForms);
 
-router.get("/section/:section_id/forms", getRecentFormsBySection);
+router.get("/section/:section_param/forms", (req, res) => {
+  const sectionParam = req.params.section_param;
 
-router.get("/sections/:section_id/opened-forms", getOpenedFormsBySection);
+  // Check if section_param is a mongoDB ID
+  if (mongoose.Types.ObjectId.isValid(sectionParam)) {
+    getRecentFormsBySectionId(req, res);
+  } else {
+    getRecentFormsBySectionName(req, res);
+  }
+});
 
 // Worker Opening APIs
 router.post("/forms/create", createForm);

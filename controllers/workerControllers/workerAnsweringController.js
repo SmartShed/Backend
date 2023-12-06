@@ -1,27 +1,61 @@
 const Form = require("../../models/Form");
 const Question = require("../../models/Question");
+const AuthToken = require("../../models/AuthToken");
+const User = require("../../models/User");
+
+
 
 const createDraft = async (req, res) => {
+
   const form_id = req.params.form_id;
 
   const auth_token = req.headers.auth_token;
 
   const { answers } = req.body;
 
+
   try {
-    const user_id = await AuthToken.findOne({ token: auth_token }, { user: 1 });
 
-    const form = await Form.findOne({ _id: form_id });
+    let user = await AuthToken.findOne({ token: auth_token }).populate('user');
+    user = user.user;
 
-    const questionIDs = form.questions;
+    if (!user) {
+      return res
+        .status(401)
+        .json({ status: "error", message: "Unauthorized access" });
+    }
 
-    for (let i = 0; i < questionIDs.length; i++) {
-      const question = await Question.findOne({ _id: questionIDs[i] });
+    console.log(user);
 
+    const form = await Form.findById(form_id)
+      .populate('questions')
+      .populate({
+        path: 'subForms',
+        populate: {
+          path: 'questions',
+        }
+      })
+      .populate('history');
+
+
+
+    if (!form) {
+      return res
+        .status(404)
+        .json({ status: "error", message: "Form not found" });
+    }
+
+    const questionsArray = form.questions.concat(form.subForms.map(subForm => subForm.questions).flat());
+
+    for (let i = 0; i < questionsArray.length; i++) {
+      const question = questionsArray[i];
       const newAnswer = answers.find((ans) => ans.question_id == question._id);
+      question.ans = newAnswer.answer;
+      question.isAnswered = true;
+      await question.save();
 
       const newHistory = {
-        editedBy: user_id,
+        editedBy: user._id,
         editedAt: Date.now(),
         changes: [
           {
@@ -34,19 +68,14 @@ const createDraft = async (req, res) => {
 
       form.history.unshift(newHistory);
 
-      question.ans = newAnswer.answer;
-      question.isAnswered = true;
-      await question.save();
+      form.updatedAt = Date.now();
       await form.save();
     }
-
-    return res
-      .status(200)
-      .json({ status: "success", message: "Draft Saved Successfully" });
+    return res.json({ status: "success", message: "Draft saved successfully" });
   } catch (err) {
     return res
       .status(500)
-      .json({ status: "error", message: "Draft saving failed" });
+      .json({ status: "error", message: err.message });
   }
 };
 
@@ -57,20 +86,47 @@ const submitForm = async (req, res) => {
 
   const { answers } = req.body;
 
+
   try {
-    const user_id = await AuthToken.findOne({ token: auth_token }, { user: 1 });
 
-    const form = await Form.findOne({ _id: form_id });
+    let user = await AuthToken.findOne({ token: auth_token }).populate('user');
+    user = user.user;
 
-    const questionIDs = form.questions;
+    if (!user) {
+      return res
+        .status(401)
+        .json({ status: "error", message: "Unauthorized access" });
+    }
 
-    for (let i = 0; i < questionIDs.length; i++) {
-      const question = await Question.findOne({ _id: questionIDs[i] });
+    console.log(user);
 
+    const form = await Form.findById(form_id)
+      .populate('questions')
+      .populate({
+        path: 'subForms',
+        populate: {
+          path: 'questions',
+        }
+      })
+
+
+    if (!form) {
+      return res
+        .status(404)
+        .json({ status: "error", message: "Form not found" });
+    }
+
+    const questionsArray = form.questions.concat(form.subForms.map(subForm => subForm.questions).flat());
+
+    for (let i = 0; i < questionsArray.length; i++) {
+      const question = questionsArray[i];
       const newAnswer = answers.find((ans) => ans.question_id == question._id);
+      question.ans = newAnswer.answer;
+      question.isAnswered = true;
+      await question.save();
 
       const newHistory = {
-        editedBy: user_id,
+        editedBy: user._id,
         editedAt: Date.now(),
         changes: [
           {
@@ -83,26 +139,17 @@ const submitForm = async (req, res) => {
 
       form.history.unshift(newHistory);
       form.submittedCount += 1;
-      form.submittedBy = user_id;
-      form.updatedAt = Date.now();
-
       if (form.submittedCount == 3) {
-        form.lockStatus = true;
+        form.isSubmitted = true;
       }
-
-      question.ans = newAnswer.answer;
-      question.isAnswered = true;
-      await question.save();
+      form.updatedAt = Date.now();
       await form.save();
     }
-
-    return res
-      .status(200)
-      .json({ status: "success", message: "Form submitted successfully" });
+    return res.json({ status: "success", message: "Form submitted successfully" });
   } catch (err) {
     return res
       .status(500)
-      .json({ status: "error", message: "Form submission failed" });
+      .json({ status: "error", message: err.message });
   }
 };
 

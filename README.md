@@ -212,7 +212,8 @@ POST /api/auth/addemployee
 {
   "worker": ["worker01@gmail.com", "worker02@gmail.com", "worker03@gmail.com"],
   "supervisor": ["supervisor01@gmail.com", "supervisor02@gmail.com"],
-  "authority": ["authority01@gmail.com"]
+  "authority": ["authority01@gmail.com"],
+  "position": "worker"
 }
 ```
 

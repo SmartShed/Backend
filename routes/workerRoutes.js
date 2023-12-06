@@ -46,6 +46,6 @@ router.get("/forms/:form_id/answers", getAnswerOfForm);
 // Worker Answering APIs
 router.post("/forms/:form_id/draft", createDraft);
 
-router.post("forms/:form_id/submit", submitForm);
+router.post("/forms/:form_id/submit", submitForm);
 
 module.exports = router;

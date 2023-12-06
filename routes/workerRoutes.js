@@ -24,7 +24,7 @@ router.get("/forms", getRecentForms);
 
 router.get("/section/:section_id/forms", getRecentFormsBySection);
 
-router.get("section/:section_id/opened-forms", getOpenedFormsBySection);
+router.get("/sections/:section_id/opened-forms", getOpenedFormsBySection);
 
 // Worker Opening APIs
 router.post("/forms/create", createForm);

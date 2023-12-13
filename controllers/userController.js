@@ -385,6 +385,48 @@ const resetPassword = async (req, res) => {
   }
 };
 
+const users = async (req, res) => {
+  try {
+    // /users (default)
+    // /users?position=authority (authority only)
+    // /users?position=authority,supervisor (authority and supervisor only)
+
+    const { position } = req.query;
+
+    const positions = position
+      ? position.split(",")
+      : ["authority", "supervisor", "worker"];
+
+    const users = await User.find({ position: { $in: positions } });
+
+    const authorityList = [];
+    const supervisorList = [];
+    const workerList = [];
+
+    users.forEach((user) => {
+      const { _id, name, position } = user;
+      if (position === "authority") {
+        authorityList.push({ _id, name, email: user.email });
+      } else if (position === "supervisor") {
+        supervisorList.push({ _id, name, email: user.email });
+      } else {
+        workerList.push({ _id, name, email: user.email });
+      }
+    });
+
+    res.status(200).json({
+      message: "Users fetched successfully",
+      users: {
+        authority: authorityList,
+        supervisor: supervisorList,
+        worker: workerList,
+      },
+    });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
 module.exports = {
   login,
   register,
@@ -395,4 +437,5 @@ module.exports = {
   forgotPassword,
   validateOTP,
   resetPassword,
+  users,
 };

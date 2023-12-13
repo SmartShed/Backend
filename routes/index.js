@@ -3,6 +3,7 @@ const userRoutes = require("./userRoutes");
 const workerRoutes = require("./workerRoutes");
 const sectionRoutes = require("./sectionRoutes");
 const smartShedRoutes = require("./smartShedRoutes");
+const others = require("./others");
 
 module.exports = {
   formRoutes,
@@ -10,4 +11,5 @@ module.exports = {
   workerRoutes,
   sectionRoutes,
   smartShedRoutes,
+  others,
 };

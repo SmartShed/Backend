@@ -1,3 +1,4 @@
 node_modules/
 /.env
 .DS_Store
+SmartShed-Backend-AWS-RC2-Key.pem

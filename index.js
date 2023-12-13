@@ -22,8 +22,8 @@ const {
   workerRoutes,
   sectionRoutes,
   smartShedRoutes,
+  others,
 } = require("./routes");
-
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -43,111 +43,92 @@ app.use("/api/workers", workerRoutes);
 app.use("/api/sections", sectionRoutes);
 app.use("/api/create", smartShedRoutes);
 
-app.get("/api/getquestions", async (req, res) => {
-  const questions = await QuestionData.find();
+app.use("/api", others);
 
-  res.status(200).json(questions);
-});
+// app.get("/api/getquestions", async (req, res) => {
+//   const questions = await QuestionData.find();
 
-app.post("/api/addquestion", async (req, res) => {
-  const question = req.body;
+//   res.status(200).json(questions);
+// });
 
-  try {
-    const que = await QuestionData.findOne({ questionID: question.questionID });
-    console.log(que);
-    if (que) {
-      res.status(400).send("Question ID already exists");
-      return;
-    }
+// app.post("/api/addquestion", async (req, res) => {
+//   const question = req.body;
 
-    const newQuestion = new QuestionData(question);
+//   try {
+//     const que = await QuestionData.findOne({ questionID: question.questionID });
+//     console.log(que);
+//     if (que) {
+//       res.status(400).send("Question ID already exists");
+//       return;
+//     }
 
-    newQuestion
-      .save()
-      .then(() => res.status(200).send("Question added"))
-      .catch((err) => res.status(400).send(err));
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-});
+//     const newQuestion = new QuestionData(question);
 
-app.post("/api/addsection", async (req, res) => {
-  const section = req.body;
+//     newQuestion
+//       .save()
+//       .then(() => res.status(200).send("Question added"))
+//       .catch((err) => res.status(400).send(err));
+//   } catch (err) {
+//     res.status(400).json({ message: err.message });
+//   }
+// });
 
-  try {
-    const sec = await SectionData.findOne({ sectionID: section.sectionID });
+// app.post("/api/addsection", async (req, res) => {
+//   const section = req.body;
 
-    if (sec) {
-      res.status(400).send("Section ID already exists");
-      return;
-    }
+//   try {
+//     const sec = await SectionData.findOne({ sectionID: section.sectionID });
 
-    const newSection = new SectionData(section);
+//     if (sec) {
+//       res.status(400).send("Section ID already exists");
+//       return;
+//     }
 
-    newSection
-      .save()
-      .then(() => res.status(200).send("Section added"))
-      .catch((err) => res.status(400).send(err));
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-});
+//     const newSection = new SectionData(section);
 
-app.post("/api/addform", async (req, res) => {
-  const form = req.body;
+//     newSection
+//       .save()
+//       .then(() => res.status(200).send("Section added"))
+//       .catch((err) => res.status(400).send(err));
+//   } catch (err) {
+//     res.status(400).json({ message: err.message });
+//   }
+// });
 
-  console.log("form", form);
+// app.post("/api/addform", async (req, res) => {
+//   const form = req.body;
 
-  try {
-    const tempForm = await FormData.findOne({ formID: form.formID });
+//   console.log("form", form);
 
-    console.log("tempForm", tempForm);
+//   try {
+//     const tempForm = await FormData.findOne({ formID: form.formID });
 
-    if (tempForm) {
-      res.status(400).send("Form ID already exists");
-      return;
-    }
+//     console.log("tempForm", tempForm);
 
-    const newForm = new FormData(form);
+//     if (tempForm) {
+//       res.status(400).send("Form ID already exists");
+//       return;
+//     }
 
-    console.log("newForm", newForm);
-    await newForm.save();
+//     const newForm = new FormData(form);
 
-    res.status(200).json({ message: "Form added" });
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-});
+//     console.log("newForm", newForm);
+//     await newForm.save();
 
-app.get("/api/clear", async (req, res) => {
-  await Question.deleteMany({});
-  await SubForm.deleteMany({});
-  await Form.deleteMany({});
+//     res.status(200).json({ message: "Form added" });
+//   } catch (err) {
+//     res.status(400).json({ message: err.message });
+//   }
+// });
 
-  res.status(200).send("Cleared");
-}
-);
+// app.get("/api/clear", async (req, res) => {
+//   await Question.deleteMany({});
+//   await SubForm.deleteMany({});
+//   await Form.deleteMany({});
+
+//   res.status(200).send("Cleared");
+// });
 
 app.listen(APP_PORT, () => {
   console.log(`Server is running on port ${APP_PORT}`);
 });
-
-// {
-//   "email": "worker02@gmail.com",
-//     "password": "12344524"
-// auth_token : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1NjJlZjFjZjYyNDZhNmExMjQyODkwOSIsImlhdCI6MTcwMDk4MzA4MywiZXhwIjoxNzAxNTg3ODgzfQ.fWU_UYYL4K0rZRjuYkQ41-485ISkWR8GjZfwkB0Xk-s
-// }
-
-// name
-// "Parth"
-// email
-// "authority01@gmail.com"
-// position
-// "authority"
-// password
-// "$2a$10$CUDpwyK5tb63rykvyhQMp.lCeLK9NyhWOMQNx00x3RLVpXrHIyQuO"
-// auth_token : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1NjI1MTZhMWQ1ZWJlNTIwMTZhNzYzNyIsImlhdCI6MTcwMDk4MzE5MiwiZXhwIjoxNzAxNTg3OTkyfQ.c3MS0VVhyIxBIzkGz4eLgwM_v-YoXEVL1dSabn9lM00
-
-// note
-// table
-// subform

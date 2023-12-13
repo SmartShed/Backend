@@ -6,6 +6,8 @@ const {
   getAllSections,
   getFormsBySectionId,
   getFormsBySectionName,
+  getOpenedFormsBySectionId,
+  getOpenedFormsBySectionName,
 } = require("../controllers/sectionController");
 
 // GET all sections
@@ -20,6 +22,17 @@ router.get("/:section_param/forms", (req, res) => {
     getFormsBySectionId(req, res);
   } else {
     getFormsBySectionName(req, res);
+  }
+});
+
+router.get("/:section_param/opened-forms", (req, res) => {
+  const sectionParam = req.params.section_param;
+
+  // Check if section_param is a mongoDB ID
+  if (mongoose.Types.ObjectId.isValid(sectionParam)) {
+    getOpenedFormsBySectionId(req, res);
+  } else {
+    getOpenedFormsBySectionName(req, res);
   }
 });
 

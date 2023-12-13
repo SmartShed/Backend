@@ -11,7 +11,6 @@ const {
   logout,
   googleLogin,
   googleRegister,
-  addEmployee,
   me,
   forgotPassword,
   validateOTP,
@@ -32,12 +31,10 @@ router.post("/addemployee", checkAuthorization, addEmployee);
 
 router.get("/me", me);
 
-router.post('/forgot-password', forgotPassword);
+router.post("/forgot-password", forgotPassword);
 
-router.post('/validate-otp', validateOTP);
+router.post("/validate-otp", validateOTP);
 
-router.post('/reset-password', resetPassword);
-
-
+router.post("/reset-password", resetPassword);
 
 module.exports = router;

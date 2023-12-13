@@ -277,40 +277,6 @@ const googleRegister = async (req, res) => {
   }
 };
 
-const removeDuplicates = (arr) => [...new Set(arr)];
-
-const addEmployee = async (req, res) => {
-  const { worker, supervisor, authority } = req.body;
-
-  try {
-    let existingInstance = await EmployeeEmail.findOne();
-
-    if (!existingInstance) {
-      existingInstance = new EmployeeEmail({ worker, supervisor, authority });
-    } else {
-      existingInstance.worker = removeDuplicates([
-        ...existingInstance.worker,
-        ...worker,
-      ]);
-      existingInstance.supervisor = removeDuplicates([
-        ...existingInstance.supervisor,
-        ...supervisor,
-      ]);
-      existingInstance.authority = removeDuplicates([
-        ...existingInstance.authority,
-        ...authority,
-      ]);
-    }
-
-    await existingInstance.save();
-
-    res.status(200).json({ message: "Employee emails added successfully!" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: error.message });
-  }
-};
-
 const me = async (req, res) => {
   try {
     const auth_token = req.headers.auth_token;
@@ -427,7 +393,6 @@ module.exports = {
   logout,
   googleLogin,
   googleRegister,
-  addEmployee,
   me,
   forgotPassword,
   validateOTP,

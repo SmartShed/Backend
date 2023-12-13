@@ -1,5 +1,5 @@
 const SectionData = require("../models/SectionData");
-const FormData = require("../models/FormData");
+const Form = require("../models/Form");
 
 const getAllSections = async (req, res) => {
   try {
@@ -10,12 +10,6 @@ const getAllSections = async (req, res) => {
         message: "No Sections found",
       });
     }
-
-    // retrive only title of the sections
-    // const sections = sections.map(section => ({
-    //     id: section._id,
-    //     title: section.title,
-    //
 
     const data = {
       message: "Sections fetched successfully",
@@ -92,4 +86,106 @@ const getFormsBySectionName = async (req, res) => {
   }
 };
 
-module.exports = { getAllSections, getFormsBySectionId, getFormsBySectionName };
+const getOpenedFormsBySectionId = async (req, res) => {
+  const sectionID = req.params.section_param;
+
+  try {
+    const Section = await SectionData.findById(sectionID);
+
+    if (!Section) {
+      throw new Error("Section not found");
+    }
+
+    const formIds = Section.forms;
+
+    let forms = await Form.find({ formID: { $in: formIds } }).populate(
+      "createdBy"
+    );
+
+    if (!forms.length) {
+      return res.status(200).json({
+        status: "success",
+        message: "No forms found",
+        forms: [],
+      });
+    }
+
+    forms = forms.map((form) => {
+      return {
+        id: form._id,
+        locoName: form.locoName,
+        locoNumber: form.locoNumber,
+        title: form.title,
+        descriptionHindi: form.descriptionHindi,
+        descriptionEnglish: form.descriptionEnglish,
+        createdAt: form.createdAt,
+        updatedAt: form.updatedAt,
+        createdBy: form.createdBy.name,
+      };
+    });
+
+    res.status(200).json({
+      status: "success",
+      message: "Forms fetched successfully",
+      forms: forms,
+    });
+  } catch (err) {
+    res.status(400).json({ status: "error", message: err.message });
+  }
+};
+
+const getOpenedFormsBySectionName = async (req, res) => {
+  const sectionName = req.params.section_param;
+
+  try {
+    const section = await SectionData.findOne({ name: sectionName });
+
+    if (!section) {
+      throw new Error("Section not found");
+    }
+
+    const formIds = section.forms;
+
+    let forms = await Form.find({ formID: { $in: formIds } }).populate(
+      "createdBy"
+    );
+
+    if (!forms.length) {
+      return res.status(200).json({
+        status: "success",
+        message: "No forms found",
+        forms: [],
+      });
+    }
+
+    forms = forms.map((form) => {
+      return {
+        id: form._id,
+        locoName: form.locoName,
+        locoNumber: form.locoNumber,
+        title: form.title,
+        descriptionHindi: form.descriptionHindi,
+        descriptionEnglish: form.descriptionEnglish,
+        createdAt: form.createdAt,
+        updatedAt: form.updatedAt,
+        createdBy: form.createdBy.name,
+      };
+    });
+
+    res.status(200).json({
+      status: "success",
+      message: "Forms fetched successfully",
+      forms: forms,
+    });
+  } catch (err) {
+    res.status(400).json({ status: "error", message: err.message });
+  }
+};
+
+module.exports = {
+  getAllSections,
+  getFormsBySectionId,
+  getFormsBySectionName,
+  getOpenedFormsBySectionId,
+  getOpenedFormsBySectionName,
+};

@@ -20,15 +20,23 @@ const {
   addQuestions,
 } = require("../controllers/smartShedControllers/questionController");
 
+const {
+  addEmployees,
+  getEmployees,
+} = require("../controllers/smartShedControllers/employeesController");
+
 router.post("/section", addSection);
 
 router.post("/form", addForm);
 router.post("/forms", addForms);
 
-router.post("/subForm", addSubForm);
-router.post("/subForms", addSubForms);
+router.post("/sub-form", addSubForm);
+router.post("/sub-forms", addSubForms);
 
 router.post("/question", addQuestion);
 router.post("/questions", addQuestions);
+
+router.post("/employees", addEmployees);
+router.get("/employees", getEmployees);
 
 module.exports = router;

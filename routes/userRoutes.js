@@ -17,6 +17,8 @@ const {
   resetPassword,
 } = require("../controllers/userController");
 
+
+
 router.post("/login", login);
 
 router.post("/register", register);
@@ -27,7 +29,6 @@ router.post("/login/google", googleLogin);
 
 router.post("/register/google", googleRegister);
 
-router.post("/addemployee", checkAuthorization, addEmployee);
 
 router.get("/me", me);
 

@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const { authorization } = require("../middlewares")
 
 const {
     getAllUnSignedForms,
@@ -14,12 +15,12 @@ const {
 
 
 // Supervisor Access Routes
-router.get("/forms/unsigned", getAllUnSignedForms);
-router.get("/forms/signed", getAllSignedForms);
-router.get("/forms/signed/:supervisorID", getSignedFormsOfSuperVisor);
+router.get("/forms/unsigned", authorization("supervisor"), getAllUnSignedForms);
+router.get("/forms/signed", authorization("supervisor"), getAllSignedForms);
+router.get("/forms/signed/:supervisorID", authorization("supervisor"), getSignedFormsOfSuperVisor);
 
 
 // Supervisor Answer Routes
-router.post("/forms/sign", signFormBySupervisor);
+router.post("/forms/sign", authorization("supervisor"), signFormBySupervisor);
 
 module.exports = router;

@@ -23,7 +23,7 @@ const sendMail = (userName, userEmail, otp) => {
     .replace("$$OTP$$", otp);
 
   let mailDetails = {
-    from: "smartshedteam@gmail.com",
+    from: "diesellocoshedpune@gmail.com",
     to: userEmail,
     subject: "SmartShed Forgot Password OTP",
     text: `Your One Time Password (OTP) for SmartShed is ${otp}. Please use this code to reset your password.`,

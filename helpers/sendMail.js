@@ -12,8 +12,8 @@ const sendMail = (userName, userEmail, otp) => {
   let mailTransporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: "smartshedteam@gmail.com",
-      pass: "cidx rouo rzao yjhi",
+      user: "diesellocoshedpune@gmail.com",
+      pass: "ojpe kyvt ylpe fsyg",
     },
   });
 

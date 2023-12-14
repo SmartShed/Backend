@@ -22,6 +22,7 @@ const {
   workerRoutes,
   sectionRoutes,
   smartShedRoutes,
+  supervisorRoutes,
   others,
 } = require("./routes");
 
@@ -40,6 +41,7 @@ app.get("/", (req, res) => {
 app.use("/api/forms", formRoutes);
 app.use("/api/auth", userRoutes);
 app.use("/api/workers", workerRoutes);
+app.use("/api/supervisors", supervisorRoutes);
 app.use("/api/sections", sectionRoutes);
 app.use("/api/create", smartShedRoutes);
 

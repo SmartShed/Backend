@@ -167,10 +167,15 @@ const getForm = async (req, res) => {
         path: "subForms",
         populate: {
           path: "questions",
-          model: "Question", // Replace with the actual model name for questions
+          model: "Question",
         },
       })
-      .populate("createdBy");
+      .populate("createdBy")
+      .populate({
+        path: "history.editedBy",
+        model: "User",
+        select: "name position",
+      });
 
     if (!form) {
       return res.status(404).json({ message: "Form not found" });

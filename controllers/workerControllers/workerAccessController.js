@@ -210,8 +210,48 @@ const getRecentFormsBySectionName = async (req, res) => {
   }
 };
 
+const getSubmittedFormsOfWorker = async (req, res) => {
+  try {
+
+    const auth_token = req.headers.auth_token;
+
+    if (!auth_token) {
+      throw new Error("Auth token not found");
+    }
+
+    let worker = await AuthToken.findOne({ token: auth_token }).populate("user");
+
+    if (!worker) {
+      throw new Error("Invalid auth token");
+    }
+
+    workerId = worker.user._id;
+
+    console.log(workerId);
+
+    const submittedForms = await Form.find({ submittedBy: workerId });
+    console.log(submittedForms);
+
+    const formsWithAccess = await Form.find({
+      access: { $in: [workerId] },
+      submittedBy: { $ne: workerId }
+    });
+
+    console.log(formsWithAccess);
+
+    res.status(200).json({
+      status: "success",
+      message: "Forms fetched successfully",
+      forms: [...submittedForms, ...formsWithAccess],
+    });
+  } catch (error) {
+    res.status(400).json({ status: "error", message: error.message });
+  }
+};
+
 module.exports = {
   getRecentForms,
   getRecentFormsBySectionId,
   getRecentFormsBySectionName,
+  getSubmittedFormsOfWorker,
 };

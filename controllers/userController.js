@@ -429,6 +429,19 @@ const users = async (req, res) => {
   }
 };
 
+
+const deleteUsers = async (req, res) => {
+  try {
+    const { users } = req.body;
+
+    await User.deleteMany({ _id: { $in: users } });
+
+    res.status(200).json({ message: "Users deleted successfully" });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
 module.exports = {
   login,
   register,
@@ -440,4 +453,5 @@ module.exports = {
   validateOTP,
   resetPassword,
   users,
+  deleteUsers,
 };

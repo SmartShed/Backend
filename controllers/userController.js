@@ -436,6 +436,8 @@ const deleteUsers = async (req, res) => {
 
     await User.deleteMany({ _id: { $in: users } });
 
+    await AuthToken.deleteMany({ user: { $in: users } });
+
     res.status(200).json({ message: "Users deleted successfully" });
   } catch (err) {
     res.status(400).json({ message: err.message });

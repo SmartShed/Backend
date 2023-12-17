@@ -4,6 +4,7 @@ const workerRoutes = require("./workerRoutes");
 const supervisorRoutes = require("./supervisorRoutes");
 const sectionRoutes = require("./sectionRoutes");
 const smartShedRoutes = require("./smartShedRoutes");
+const notificationRoutes = require("./notificationRoutes");
 const others = require("./others");
 
 module.exports = {
@@ -13,5 +14,6 @@ module.exports = {
   supervisorRoutes,
   sectionRoutes,
   smartShedRoutes,
+  notificationRoutes,
   others,
 };

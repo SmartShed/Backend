@@ -17,6 +17,7 @@ const {
   sectionRoutes,
   smartShedRoutes,
   supervisorRoutes,
+  notificationRoutes,
   others,
 } = require("./routes");
 
@@ -33,6 +34,7 @@ app.use("/api/workers", workerRoutes);
 app.use("/api/supervisors", supervisorRoutes);
 app.use("/api/sections", sectionRoutes);
 app.use("/api/create", smartShedRoutes);
+app.use("/api/notifications", notificationRoutes)
 app.use("/api", others);
 
 app.listen(APP_PORT, () =>

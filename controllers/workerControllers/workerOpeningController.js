@@ -7,6 +7,9 @@ const User = require("../../models/User");
 const SubFormData = require("../../models/SubFormData");
 const SubForm = require("../../models/SubForm");
 
+const { createNotifications, createNotification } = require("../../helpers/notificationHelper");
+const { getAllAuthorityIds, getAllSupervisorIds, getAllWorkerIds } = require("../../helpers/userHelper");
+
 const createForm = async (req, res) => {
   // const form_id = req.params.form_id;
   const auth_token = req.headers.auth_token;
@@ -147,6 +150,12 @@ const createForm = async (req, res) => {
       createdBy: user.name,
       lockStatus: newForm.lockStatus,
     };
+
+    // create notification
+    const workerIds = await getAllWorkerIds();
+
+    const notifications = await createNotifications(workerIds, `${user.name} has created a new form ${newForm.title}`);
+
 
     res.status(201).json({
       message: "Form created successfully",

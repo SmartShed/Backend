@@ -1,6 +1,9 @@
 const AuthToken = require("../../models/AuthToken");
 const Form = require("../../models/Form");
 
+const { createNotifications, createNotification } = require("../../helpers/notificationHelper");
+const { getAllAuthorityIds, getAllSupervisorIds, getAllWorkerIds } = require("../../helpers/userHelper");
+
 const signFormBySupervisor = async (req, res) => {
     try {
         const auth_token = req.headers.auth_token;
@@ -32,6 +35,15 @@ const signFormBySupervisor = async (req, res) => {
         form.lockStatus = true;
 
         await form.save();
+
+
+        const workerIDs = getAllWorkerIds();
+        const supervisorIDs = getAllSupervisorIds();
+        const authorityIDs = getAllAuthorityIds();
+
+        const notification = createNotifications(workerIDs, `Form ${form.formName} has been signed by supervisor ${supervisor.name}`)
+        const notification2 = createNotifications(supervisorIDs, `Form ${form.formName} has been signed by supervisor ${supervisor.name}`)
+        const notifications3 = createNotifications(authorityIDs, `Form ${form.formName} has been signed by supervisor ${supervisor.name}`)
 
         res.status(200).json({ status: "success", message: "Form signed successfully!" });
 

@@ -2,6 +2,9 @@ const Form = require("../../models/Form");
 const Question = require("../../models/Question");
 const AuthToken = require("../../models/AuthToken");
 
+const { createNotifications, createNotification } = require("../../helpers/notificationHelper");
+const { getAllAuthorityIds, getAllSupervisorIds, getAllWorkerIds } = require("../../helpers/userHelper");
+
 const createDraft = async (req, res) => {
   const form_id = req.params.form_id;
 
@@ -171,6 +174,16 @@ const submitForm = async (req, res) => {
     }
     form.updatedAt = Date.now();
     await form.save();
+
+    const supervisorIds = await getAllSupervisorIds();
+
+    const notification = await createNotifications(
+      supervisorIds,
+      `Form ${form.name} has been submitted by ${user.name}`
+    );
+
+
+
 
     return res.json({
       status: "success",

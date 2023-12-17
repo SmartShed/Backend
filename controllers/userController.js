@@ -11,6 +11,9 @@ const { sendMail } = require("../helpers");
 const { JWT_SECRET } = require("../config");
 
 
+const { createNotifications, createNotification } = require("../helpers/notificationHelper");
+const { getAllAuthorityIds, getAllSupervisorIds, getAllWorkerIds } = require("../helpers/userHelper");
+
 
 const loginSchema = Joi.object({
   email: Joi.string().email().required(),
@@ -380,6 +383,8 @@ const resetPassword = async (req, res) => {
     }
 
     await AuthToken.deleteMany({ user: user._id });
+
+    const notification = createNotification(user._id, "Your password has been reset successfully");
 
     res.status(200).json({ message: "Password reset successfully" });
   } catch (err) {

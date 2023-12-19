@@ -167,20 +167,33 @@ const getForm = async (req, res) => {
         path: "subForms",
         populate: {
           path: "questions",
-          model: "Question", // Replace with the actual model name for questions
+          model: "Question",
         },
       })
-      .populate("createdBy");
+      .populate("createdBy")
+      .populate({
+        path: "history.editedBy",
+        model: "User",
+        select: "name",
+      });
 
     if (!form) {
       return res.status(404).json({ message: "Form not found" });
     }
 
+    const createdBy = form.createdBy.name;
+    const history = form.history.map((h) => ({
+      editedBy: h.editedBy.name,
+      editedAt: h.editedAt,
+      changes: h.changes,
+    }));
+
     return res.status(200).json({
       message: "Form retrieved successfully",
       form: {
         ...form._doc,
-        createdBy: form.createdBy.name,
+        createdBy,
+        history,
       },
     });
   } catch (error) {

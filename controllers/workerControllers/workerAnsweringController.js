@@ -51,25 +51,39 @@ const createDraft = async (req, res) => {
 
     await Question.bulkWrite(bulkUpdateOperations);
 
-    const newHistories = bulkUpdateOperations.map((operation) => ({
+    const newHistory = {
       editedBy: user._id,
       editedAt: Date.now(),
-      changes: [
-        {
-          questionID: operation.updateOne.filter._id,
-          oldValue: operation.updateOne.update.ans,
-          newValue: operation.updateOne.update.ans,
-        },
-      ],
-    }));
+      changes: [],
+    };
 
-    form.history.unshift(...newHistories);
+    bulkUpdateOperations.forEach((operation) => {
+      const questionID = operation.updateOne.filter._id;
+      const oldValue = questionsArray.find(
+        (question) => question._id == questionID
+      ).ans;
+      const newValue = answers.find(
+        (ans) => ans.question_id == questionID
+      ).answer;
 
-    form.updatedAt = Date.now();
-    await form.save();
+      if (oldValue !== newValue) {
+        newHistory.changes.push({
+          questionID,
+          oldValue,
+          newValue,
+        });
+      }
+    });
+
+    if (newHistory.changes.length > 0) {
+      form.history.unshift(newHistory);
+      form.updatedAt = Date.now();
+      await form.save();
+    }
 
     return res.json({ status: "success", message: "Draft saved successfully" });
   } catch (err) {
+    console.log(err);
     return res.status(500).json({ status: "error", message: err.message });
   }
 };
@@ -98,7 +112,8 @@ const submitForm = async (req, res) => {
         populate: {
           path: "questions",
         },
-      });
+      })
+      .populate("history");
 
     if (!form) {
       return res
@@ -125,20 +140,38 @@ const submitForm = async (req, res) => {
     const newHistory = {
       editedBy: user._id,
       editedAt: Date.now(),
-      changes: bulkUpdateOperations.map((operation) => ({
-        questionID: operation.updateOne.filter._id,
-        oldValue: operation.updateOne.update.ans,
-        newValue: operation.updateOne.update.ans,
-      })),
+      changes: [],
     };
 
-    form.history.unshift(newHistory);
+    bulkUpdateOperations.forEach((operation) => {
+      const questionID = operation.updateOne.filter._id;
+      const oldValue = questionsArray.find(
+        (question) => question._id == questionID
+      ).ans;
+      const newValue = answers.find(
+        (ans) => ans.question_id == questionID
+      ).answer;
+
+      if (oldValue !== newValue) {
+        newHistory.changes.push({
+          questionID,
+          oldValue,
+          newValue,
+        });
+      }
+    });
+
+    if (newHistory.changes.length > 0) {
+      form.history.unshift(newHistory);
+    }
+
     form.submittedCount += 1;
     if (form.submittedCount == 3) {
       form.isSubmitted = true;
     }
     form.updatedAt = Date.now();
     await form.save();
+
     return res.json({
       status: "success",
       message: "Form submitted successfully",

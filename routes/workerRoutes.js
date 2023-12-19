@@ -6,6 +6,7 @@ const {
   getRecentForms,
   getRecentFormsBySectionId,
   getRecentFormsBySectionName,
+  getSubmittedFormsOfWorker,
 } = require("../controllers/workerControllers/workerAccessController");
 
 const {
@@ -33,6 +34,8 @@ router.get("/section/:section_param/forms", (req, res) => {
     getRecentFormsBySectionName(req, res);
   }
 });
+
+router.get("/forms/submitted", getSubmittedFormsOfWorker);
 
 // Worker Opening APIs
 router.post("/forms/create", createForm);

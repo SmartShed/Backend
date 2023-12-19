@@ -10,6 +10,8 @@ const Joi = require("joi");
 const { sendMail } = require("../helpers");
 const { JWT_SECRET } = require("../config");
 
+
+
 const loginSchema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().required(),

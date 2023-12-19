@@ -1,8 +1,8 @@
 const Notification = require('../models/Notification');
 
-const createNotification = async (userId, content) => {
+const createNotification = async (userId, type, content) => {
     try {
-        const notification = new Notification({ user: userId, content });
+        const notification = new Notification({ user: userId, type, content });
         await notification.save();
         return notification;
     } catch (error) {
@@ -11,12 +11,13 @@ const createNotification = async (userId, content) => {
     }
 };
 
-const createNotifications = async (userIds, content) => {
+const createNotifications = async (userIds, type, content) => {
     try {
         const allNotifications = userIds.map((userId) => {
             return {
                 user: userId,
                 content: content,
+                type: type,
                 isRead: false,
                 createdAt: Date.now()
             }

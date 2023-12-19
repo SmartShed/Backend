@@ -12,18 +12,21 @@ const sendMail = (userName, userEmail, otp) => {
   let mailTransporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: "smartshedteam@gmail.com",
-      pass: "cidx rouo rzao yjhi",
+      user: EMAIL,
+      pass: PASSWORD,
     },
   });
 
   const emailBody = otpEmailTemplate
-    .replace("$$NAME$$", userName)
-    .replace("$$EMAIL$$", userEmail)
-    .replace("$$OTP$$", otp);
+    .replaceAll("$$NAME$$", userName)
+    .replaceAll("$$EMAIL$$", userEmail)
+    .replaceAll("$$OTP$$", otp);
 
   let mailDetails = {
-    from: "smartshedteam@gmail.com",
+    from: {
+      name: "SmartShed",
+      address: EMAIL,
+    },
     to: userEmail,
     subject: "SmartShed Forgot Password OTP",
     text: `Your One Time Password (OTP) for SmartShed is ${otp}. Please use this code to reset your password.`,

@@ -10,6 +10,11 @@ const userSchema = new mongoose.Schema({
     enum: ["authority", "supervisor", "worker"],
     required: true,
   },
+  section: {
+    type: String,
+    enum: ["HRE", "LSRM", "HSRE", "HSRM", "LSRE"],
+    required: true
+  },
   password: { type: String, required: true },
   isGoogle: { type: Boolean, default: false },
   forms: [{ type: mongoose.Types.ObjectId, ref: "Form" }],

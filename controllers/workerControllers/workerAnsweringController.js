@@ -99,6 +99,8 @@ const submitForm = async (req, res) => {
   const { answers } = req.body;
 
   try {
+
+
     let user = await AuthToken.findOne({ token: auth_token }).populate("user");
     user = user.user;
 
@@ -118,11 +120,18 @@ const submitForm = async (req, res) => {
       })
       .populate("history");
 
+
+
     if (!form) {
       return res
         .status(404)
         .json({ status: "error", message: "Form not found" });
     }
+
+    if (form.lockStatus) {
+      return res.status(400).json({ status: "error", message: "Form is locked" });
+    }
+
 
     const questionsArray = form.questions.concat(
       form.subForms.map((subForm) => subForm.questions).flat()
@@ -170,7 +179,7 @@ const submitForm = async (req, res) => {
 
     form.submittedCount += 1;
     if (form.submittedCount == 3) {
-      form.isSubmitted = true;
+      form.lockStatus = true;
     }
     form.updatedAt = Date.now();
     await form.save();
@@ -183,7 +192,9 @@ const submitForm = async (req, res) => {
     );
 
 
+    user.forms = user.forms.filter((form) => form != form_id);
 
+    await user.save();
 
     return res.json({
       status: "success",

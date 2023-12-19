@@ -25,6 +25,7 @@ const registerSchema = Joi.object({
   password: Joi.string().required().min(6).max(20),
   name: Joi.string().required(),
   position: Joi.string().valid("authority", "supervisor", "worker").required(),
+  section: Joi.string().valid("HRE", "LSRM", "HSRE", "HSRM", "LSRE").required(),
 });
 
 const logoutSchema = Joi.object({
@@ -39,6 +40,7 @@ const googleRegisterSchema = Joi.object({
   email: Joi.string().email().required(),
   name: Joi.string().required(),
   position: Joi.string().valid("authority", "supervisor", "worker").required(),
+  section: Joi.string().valid("HRE", "LSRM", "HSRE", "HSRM", "LSRE").required(),
 });
 
 const validateRequest = (req, schema) => {
@@ -102,7 +104,7 @@ const register = async (req, res) => {
   try {
     validateRequest(req, registerSchema);
 
-    const { email, password, name, position } = req.body;
+    const { email, password, name, position, section } = req.body;
 
     const validEmails = await EmployeeEmail.findOne();
 
@@ -132,6 +134,7 @@ const register = async (req, res) => {
       password: hashedPassword,
       name,
       position,
+      section,
     });
 
     await newUser.save();
@@ -222,7 +225,7 @@ const googleRegister = async (req, res) => {
   try {
     validateRequest(req, googleRegisterSchema);
 
-    const { email, name, position } = req.body;
+    const { email, name, position, section } = req.body;
 
     const validEmails = await EmployeeEmail.findOne();
 
@@ -248,6 +251,7 @@ const googleRegister = async (req, res) => {
       email,
       name,
       position,
+      section,
       password: "google",
       isGoogle: true,
     });
@@ -273,6 +277,7 @@ const googleRegister = async (req, res) => {
         email: newUser.email,
         name: newUser.name,
         position: newUser.position,
+        section: newUser.section,
       },
     });
   } catch (err) {
@@ -305,6 +310,7 @@ const me = async (req, res) => {
       email: user.email,
       name: user.name,
       position: user.position,
+      section: user.section,
       forms: user.forms,
     });
   } catch (err) {

@@ -8,7 +8,7 @@ const getAllUnSignedForms = async (req, res) => {
 
         let forms = await Form.find({
             "signedBySupervisor.isSigned": false
-        });
+        }).populate('createdBy');
 
         forms = forms.map((form) => {
             return {
@@ -22,7 +22,11 @@ const getAllUnSignedForms = async (req, res) => {
                 submittedCount: form.submittedCount,
                 lockStatus: form.lockStatus,
                 signedBySupervisor: form.signedBySupervisor,
-                createdBy: form.createdBy,
+                createdBy: {
+                    id: form.createdBy._id,
+                    name: form.createdBy.name,
+                    section: form.createdBy.section,
+                },
                 submittedBy: form.submittedBy,
                 createdAt: form.createdAt,
                 updatedAt: form.updatedAt,
@@ -43,7 +47,7 @@ const getAllSignedForms = async (req, res) => {
 
         let forms = await Form.find({
             "signedBySupervisor.isSigned": true
-        }).polulate("signedBySupervisor.supervisor")
+        }).polulate("signedBySupervisor.supervisor").polulate("createdBy");
 
         forms = forms.map((form) => {
             return {
@@ -57,7 +61,11 @@ const getAllSignedForms = async (req, res) => {
                 submittedCount: form.submittedCount,
                 lockStatus: form.lockStatus,
                 signedBySupervisor: form.signedBySupervisor,
-                createdBy: form.createdBy,
+                createdBy: {
+                    id: form.createdBy._id,
+                    name: form.createdBy.name,
+                    section: form.createdBy.section,
+                },
                 submittedBy: form.submittedBy,
                 createdAt: form.createdAt,
                 updatedAt: form.updatedAt,
@@ -83,7 +91,7 @@ const getSignedFormsOfSuperVisor = async (req, res) => {
 
         let forms = await Form.find({
             "signedBySupervisor.supervisor": supervisorID
-        }).populate("signedBySupervisor.supervisor")
+        }).populate("signedBySupervisor.supervisor").populate("createdBy");
 
         forms = forms.map((form) => {
             return {
@@ -97,7 +105,11 @@ const getSignedFormsOfSuperVisor = async (req, res) => {
                 submittedCount: form.submittedCount,
                 lockStatus: form.lockStatus,
                 signedBySupervisor: form.signedBySupervisor,
-                createdBy: form.createdBy,
+                createdBy: {
+                    id: form.createdBy._id,
+                    name: form.createdBy.name,
+                    section: form.createdBy.section,
+                },
                 submittedBy: form.submittedBy,
                 createdAt: form.createdAt,
                 updatedAt: form.updatedAt,

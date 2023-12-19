@@ -147,7 +147,11 @@ const createForm = async (req, res) => {
       locoNumber: newForm.locoNumber,
       createdAt: newForm.createdAt,
       updatedAt: newForm.updatedAt,
-      createdBy: user.name,
+      createdBy: {
+        id: user._id,
+        name: user.name,
+        section: user.section,
+      },
       lockStatus: newForm.lockStatus,
     };
 
@@ -183,14 +187,18 @@ const getForm = async (req, res) => {
       .populate({
         path: "history.editedBy",
         model: "User",
-        select: "name",
+        select: "name section",
       });
 
     if (!form) {
       return res.status(404).json({ message: "Form not found" });
     }
 
-    const createdBy = form.createdBy.name;
+    const createdBy = {
+      id: form.createdBy._id,
+      name: form.createdBy.name,
+      section: form.createdBy.section,
+    };
     const history = form.history.map((h) => ({
       editedBy: h.editedBy.name,
       editedAt: h.editedAt,
@@ -260,6 +268,7 @@ const getAnswer = async (req, res) => {
         answer: question.ans,
         answer_by: {
           name: user.name,
+          section: user.section,
           edited_at: questionHistory.editedAt,
         },
       },
@@ -278,8 +287,7 @@ const getAnswerOfForm = async (req, res) => {
       .populate("questions")
       .populate("subForms");
     if (!form) {
-      res.status(400).json({ message: "Form does not exist" });
-      return;
+      return res.status(400).json({ message: "Form does not exist" });
     }
 
     res.status(201).json({

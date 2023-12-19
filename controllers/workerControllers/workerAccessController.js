@@ -49,7 +49,11 @@ const getRecentForms = async (req, res) => {
         descriptionHindi: form.descriptionHindi,
         createdAt: form.createdAt,
         updatedAt: form.updatedAt,
-        createdBy: form.createdBy.name,
+        createdBy: {
+          id: user._id,
+          name: user.name,
+          section: user.section,
+        },
         lockStatus: form.lockStatus,
       };
     });
@@ -123,7 +127,11 @@ const getRecentFormsBySectionId = async (req, res) => {
         createdAt: newForm.createdAt,
         updatedAt: newForm.updatedAt,
         lockStatus: newForm.lockStatus,
-        createdBy: newForm.createdBy.name,
+        createdBy: {
+          id: user._id,
+          name: user.name,
+          section: user.section,
+        }
       };
     });
 
@@ -195,7 +203,11 @@ const getRecentFormsBySectionName = async (req, res) => {
         createdAt: newForm.createdAt,
         updatedAt: newForm.updatedAt,
         lockStatus: newForm.lockStatus,
-        createdBy: newForm.createdBy.name,
+        createdBy: {
+          id: user._id,
+          name: user.name,
+          section: user.section,
+        },
         createdAt: newForm.createdAt,
       };
     });

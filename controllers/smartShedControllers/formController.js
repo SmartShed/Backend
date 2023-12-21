@@ -3,19 +3,19 @@ const FormData = require("../../models/FormData");
 
 const addForm = async (req, res) => {
   try {
-    let { title, descriptionHindi, descriptionEnglish, sectionID } = req.body;
+    let { title, descriptionHindi, descriptionEnglish, sectionName } = req.body;
 
     if (title) title = title.trim();
     if (descriptionHindi) descriptionHindi = descriptionHindi.trim();
     if (descriptionEnglish) descriptionEnglish = descriptionEnglish.trim();
-    if (sectionID) sectionID = sectionID.trim();
+    if (sectionName) sectionName = sectionName.trim();
 
-    if (!title || !sectionID) {
-      throw new Error("Form title or section ID not found");
+    if (!title || !sectionName) {
+      throw new Error("Form title or section name not found");
     }
 
     // Check if section exists
-    const section = await SectionData.findById(sectionID);
+    const section = await SectionData.findOne({ name: sectionName });
 
     if (!section) {
       throw new Error("Section not found");
@@ -23,10 +23,11 @@ const addForm = async (req, res) => {
 
     const form = new FormData({
       title: title,
-      description: description,
+      descriptionEnglish: descriptionEnglish,
+      descriptionHindi: descriptionHindi,
       subForms: [],
       questions: [],
-      sectionID: sectionID,
+      sectionID: section._id,
     });
 
     await form.save();
@@ -46,16 +47,16 @@ const addForm = async (req, res) => {
 const addForms = async (req, res) => {
   try {
     // Take sectionID and array of [title, description] as input
-    let { sectionID, forms } = req.body;
+    let { sectionName, forms } = req.body;
 
-    if (sectionID) sectionID = sectionID.trim();
+    if (sectionName) sectionName = sectionName.trim();
 
-    if (!sectionID || !forms) {
-      throw new Error("Section ID or forms not found");
+    if (!sectionName || !forms) {
+      throw new Error("Section name or forms not found");
     }
 
     // Check if section exists
-    const section = await SectionData.findById(sectionID);
+    const section = await SectionData.findOne({ name: sectionName });
 
     if (!section) {
       throw new Error("Section not found");
@@ -69,7 +70,7 @@ const addForms = async (req, res) => {
         descriptionHindi: form.descriptionHindi.trim(),
         subForms: [],
         questions: [],
-        sectionID: sectionID,
+        sectionID: section._id,
       });
     });
 

@@ -120,7 +120,11 @@ const getOpenedFormsBySectionId = async (req, res) => {
         descriptionEnglish: form.descriptionEnglish,
         createdAt: form.createdAt,
         updatedAt: form.updatedAt,
-        createdBy: form.createdBy.name,
+        createdBy: {
+          id: form.createdBy._id,
+          name: form.createdBy.name,
+          section: form.createdBy.section,
+        },
       };
     });
 
@@ -168,7 +172,11 @@ const getOpenedFormsBySectionName = async (req, res) => {
         descriptionEnglish: form.descriptionEnglish,
         createdAt: form.createdAt,
         updatedAt: form.updatedAt,
-        createdBy: form.createdBy.name,
+        createdBy: {
+          id: form.createdBy._id,
+          name: form.createdBy.name,
+          section: form.createdBy.section,
+        }
       };
     });
 

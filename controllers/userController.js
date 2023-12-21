@@ -14,6 +14,7 @@ const { JWT_SECRET } = require("../config");
 
 const { createNotifications, createNotification } = require("../helpers/notificationHelper");
 const { getAllAuthorityIds, getAllSupervisorIds, getAllWorkerIds } = require("../helpers/userHelper");
+const SectionData = require("../models/SectionData");
 
 
 const loginSchema = Joi.object({
@@ -21,14 +22,16 @@ const loginSchema = Joi.object({
   password: Joi.string().required(),
 });
 
-const sectionNames = await SectionData.find().select("name").exec();
 
 const registerSchema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().required().min(6).max(20),
   name: Joi.string().required(),
   position: Joi.string().valid("authority", "supervisor", "worker").required(),
-  section: Joi.string().valid(...sectionNames).required(),
+  section: Joi.string().valid(async () => {
+    const sectionData = await SectionData.find();
+    return sectionData.map((section) => section.name);
+  }).required(),
 });
 
 const logoutSchema = Joi.object({
@@ -43,7 +46,10 @@ const googleRegisterSchema = Joi.object({
   email: Joi.string().email().required(),
   name: Joi.string().required(),
   position: Joi.string().valid("authority", "supervisor", "worker").required(),
-  section: Joi.string().valid(...sectionNames).required(),
+  section: Joi.string().valid(async () => {
+    const sectionData = await SectionData.find();
+    return sectionData.map((section) => section.name);
+  }).required(),
 });
 
 const validateRequest = (req, schema) => {

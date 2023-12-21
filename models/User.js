@@ -12,8 +12,6 @@ const userSchema = new mongoose.Schema({
   },
   section: {
     type: String,
-    enum: ["HRE", "LSRM", "HSRE", "HSRM", "LSRE"],
-    required: true
   },
   password: { type: String, required: true },
   isGoogle: { type: Boolean, default: false },

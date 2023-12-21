@@ -5,6 +5,7 @@ const AuthToken = require("../models/AuthToken");
 
 const EmployeeEmail = require("../models/EmployeeEmail");
 const Otp = require("../models/Otp");
+const SecitonData = require("../models/SectionData");
 const Joi = require("joi");
 
 const { sendMail } = require("../helpers");
@@ -20,12 +21,14 @@ const loginSchema = Joi.object({
   password: Joi.string().required(),
 });
 
+const sectionNames = await SectionData.find().select("name").exec();
+
 const registerSchema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().required().min(6).max(20),
   name: Joi.string().required(),
   position: Joi.string().valid("authority", "supervisor", "worker").required(),
-  section: Joi.string().valid("HRE", "LSRM", "HSRE", "HSRM", "LSRE").required(),
+  section: Joi.string().valid(...sectionNames).required(),
 });
 
 const logoutSchema = Joi.object({
@@ -40,7 +43,7 @@ const googleRegisterSchema = Joi.object({
   email: Joi.string().email().required(),
   name: Joi.string().required(),
   position: Joi.string().valid("authority", "supervisor", "worker").required(),
-  section: Joi.string().valid("HRE", "LSRM", "HSRE", "HSRM", "LSRE").required(),
+  section: Joi.string().valid(...sectionNames).required(),
 });
 
 const validateRequest = (req, schema) => {

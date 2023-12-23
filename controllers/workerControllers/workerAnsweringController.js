@@ -3,7 +3,7 @@ const Question = require("../../models/Question");
 const AuthToken = require("../../models/AuthToken");
 
 const { createNotifications, createNotification } = require("../../helpers/notificationHelper");
-const { getAllAuthorityIds, getAllSupervisorIds, getAllWorkerIds } = require("../../helpers/userHelper");
+const { getAllAuthorityIds, getAllSupervisorIds, getAllWorkerIds, getSupervisorIdsBySection, getWorkerIdsBySection } = require("../../helpers/userHelper");
 
 const createDraft = async (req, res) => {
   const form_id = req.params.form_id;
@@ -133,6 +133,8 @@ const submitForm = async (req, res) => {
     }
 
 
+    const workerIds = form.access;
+
     const questionsArray = form.questions.concat(
       form.subForms.map((subForm) => subForm.questions).flat()
     );
@@ -184,17 +186,30 @@ const submitForm = async (req, res) => {
     form.updatedAt = Date.now();
     await form.save();
 
-    const supervisorIds = await getAllSupervisorIds();
 
-    const notification = await createNotifications(
-      supervisorIds,
-      `Form ${form.name} has been submitted by ${user.name}`
-    );
 
 
     user.forms = user.forms.filter((form) => form != form_id);
 
     await user.save();
+
+    const notifications = await createNotifications(
+      workerIds,
+      `Form ${form.title} for loco ${form.locoNumber} loconame ${form.locoName} submitted by ${user.name}`,
+      `लोको ${form.locoNumber} लोको नाम ${form.locoName} द्वारा ${user.name} द्वारा जमा किया गया फॉर्म ${form.title}`,
+      form._id,
+      null
+    );
+
+    const supervisorIDs = await getAllSupervisorIds();
+
+    const notification2 = await createNotifications(
+      supervisorIDs,
+      `Form ${form.title} for loco ${form.locoNumber} loconame ${form.locoName} submitted by ${user.name}`,
+      `लोको ${form.locoNumber} लोको नाम ${form.locoName} द्वारा ${user.name} द्वारा जमा किया गया फॉर्म ${form.title}`,
+      form._id,
+      null
+    );
 
     return res.json({
       status: "success",

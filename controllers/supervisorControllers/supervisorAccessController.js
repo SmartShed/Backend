@@ -5,7 +5,6 @@ const User = require("../../models/User");
 
 const getAllUnSignedForms = async (req, res) => {
     try {
-
         let forms = await Form.find({
             "signedBySupervisor.isSigned": false
         }).populate('createdBy');
@@ -32,8 +31,6 @@ const getAllUnSignedForms = async (req, res) => {
                 updatedAt: form.updatedAt,
             }
         })
-
-        console.log(forms);
         res.status(200).json(forms);
     }
     catch (err) {

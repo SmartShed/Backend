@@ -138,6 +138,8 @@ const createForm = async (req, res) => {
 
     await user.save();
 
+
+
     const resForm = {
       id: newForm._id,
       title: newForm.title,
@@ -155,10 +157,15 @@ const createForm = async (req, res) => {
       lockStatus: newForm.lockStatus,
     };
 
-    // create notification
     const workerIds = await getAllWorkerIds();
 
-    const notifications = await createNotifications(workerIds, `${user.name} has created a new form ${newForm.title}`);
+    const notification = createNotification(
+      workerIds,
+      `New form opened ${newForm.title} for ${newForm.locoName} ${newForm.locoNumber} by ${user.name}`,
+      `नया फॉर्म खोला गया ${newForm.title} ${newForm.locoName} ${newForm.locoNumber} द्वारा ${user.name}`,
+      newForm._id,
+      user._id
+    );
 
 
     res.status(201).json({
@@ -169,6 +176,31 @@ const createForm = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+
+const getOpeningForms = async (req, res) => {
+  const { form_id } = req.params;
+
+  try {
+    const form = FormData.findById(form_id).populate("questions").populate("subForms").populate("subForms.questions");
+
+    if (!form) {
+      return res.status(400).json({ message: "Form does not exist" });
+    }
+
+    return res.status(200).json({
+      message: "Form retrieved successfully",
+      form: form,
+    });
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+
+
+
 
 const getForm = async (req, res) => {
   try {
@@ -301,6 +333,7 @@ const getAnswerOfForm = async (req, res) => {
 
 module.exports = {
   createForm,
+  getOpeningForms,
   getForm,
   getAnswer,
   getAnswerOfForm,

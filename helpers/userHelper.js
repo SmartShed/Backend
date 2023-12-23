@@ -43,4 +43,32 @@ const getAllAuthorityIds = async () => {
     }
 }
 
-module.exports = { getAllWorkerIds, getAllSupervisorIds, getAllAuthorityIds };
+const getWorkerIdsBySection = async (sectionName) => {
+    try {
+        const workers = await User.find({ position: "worker", section: sectionName });
+
+        const workerIds = workers.map((worker) => worker._id);
+
+        return workerIds;
+
+    } catch (error) {
+        console.error(error);
+        throw new Error(error.message);
+    }
+}
+
+const getSupervisorIdsBySection = async (sectionName) => {
+    try {
+        const supervisors = await User.find({ position: "supervisor", section: sectionName });
+
+        const supervisorIds = supervisors.map((supervisor) => supervisor._id);
+
+        return supervisorIds;
+
+    } catch (error) {
+        console.error(error);
+        throw new Error(error.message);
+    }
+}
+
+module.exports = { getAllWorkerIds, getAllSupervisorIds, getAllAuthorityIds, getWorkerIdsBySection, getSupervisorIdsBySection };

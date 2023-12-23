@@ -11,32 +11,32 @@ const formSchema = new mongoose.Schema({
   subForms: [{ type: mongoose.Types.ObjectId, ref: "SubForm" }],
   submittedCount: { type: Number, default: 0 },
   lockStatus: { type: Boolean, default: false },
-  // signedBySupervisor: {
-  //   isSigned: {
-  //     type: Boolean,
-  //     default: false
-  //   },
-  //   supervisor:
-  //   {
-  //     type: mongoose.Schema.Types.ObjectId,
-  //     ref: 'User',
-  //   }
-  //   ,
-  //   signedAt: { type: Date, default: Date.now },
-  // },
-  // signedByAuthority: {
-  //   isSigned: {
-  //     type: Boolean,
-  //     default: false
-  //   },
-  //   authority:
-  //   {
-  //     type: mongoose.Schema.Types.ObjectId,
-  //     ref: 'User',
-  //   },
-  //   signedAt: { type: Date, default: Date.now },
+  signedBySupervisor: {
+    isSigned: {
+      type: Boolean,
+      default: false
+    },
+    supervisor:
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    }
+    ,
+    signedAt: { type: Date, default: Date.now },
+  },
+  signedByAuthority: {
+    isSigned: {
+      type: Boolean,
+      default: false
+    },
+    authority:
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+    signedAt: { type: Date, default: Date.now },
 
-  // },
+  },
   access: [{ type: mongoose.Types.ObjectId, ref: "User" }],
   createdBy: { type: mongoose.Types.ObjectId, ref: "User" },
   submittedBy: { type: mongoose.Types.ObjectId, ref: "User" },

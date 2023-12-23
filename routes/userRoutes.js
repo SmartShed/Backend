@@ -15,7 +15,9 @@ const {
   forgotPassword,
   validateOTP,
   resetPassword,
+  getUser
 } = require("../controllers/userController");
+const { get } = require("https");
 
 
 
@@ -37,5 +39,7 @@ router.post("/forgot-password", forgotPassword);
 router.post("/validate-otp", validateOTP);
 
 router.post("/reset-password", resetPassword);
+
+router.get('/getuser/:id', getUser);
 
 module.exports = router;

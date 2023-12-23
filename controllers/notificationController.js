@@ -48,6 +48,58 @@ const markNotificationAsRead = async (req, res) => {
     }
 };
 
+const deleteNotification = async (req, res) => {
+    const auth_token = req.headers.auth_token;
+    const notificationId = req.params.id;
+
+    try {
+        const notification = await Notification.findById(notificationId);
+
+        if (notification.user.toString() !== userId.toString()) {
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+
+        const response = await Notification.findByIdAndDelete(notificationId);
+
+        if (!response) {
+            return res.status(404).json({ message: 'Notification not found' });
+        }
+
+        return res.status(200).json({ message: 'Notification deleted successfully' });
+
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+}
+
+const deleteAllNotifications = async (req, res) => {
+    const auth_token = req.headers.auth_token;
+
+    try {
+        let user = await AuthToken.findOne({ token: auth_token }).populate('user');
+
+        user = user.user;
+
+        const userId = user._id;
+
+        const response = await Notification.deleteMany({ user: userId });
+
+        if (!response) {
+            return res.status(404).json({ message: 'Notifications not found' });
+        }
+
+        return res.status(200).json({ message: 'Notifications deleted successfully' });
+
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+}
 
 
-module.exports = { getNotifications, markNotificationAsRead };
+
+
+
+
+
+
+module.exports = { getNotifications, markNotificationAsRead, deleteNotification, deleteAllNotifications };

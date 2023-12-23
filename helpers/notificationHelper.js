@@ -1,9 +1,16 @@
 const Notification = require('../models/Notification');
 
-const createNotification = async (userId, type, content) => {
+const createNotification = async (user, contentEnglish, contentHindi, formId, userId) => {
     try {
-        const notification = new Notification({ user: userId, type, content });
-        await notification.save();
+        const notification = await Notification.create({
+            user: user,
+            contentEnglish: contentEnglish,
+            contentHindi: contentHindi,
+            formId: formId,
+            userId: userId
+        });
+
+        notification.save();
         return notification;
     } catch (error) {
         console.error(error);
@@ -11,19 +18,17 @@ const createNotification = async (userId, type, content) => {
     }
 };
 
-const createNotifications = async (userIds, type, content) => {
+const createNotifications = async (users, contentEnglish, contentHindi, formId, userId) => {
     try {
-        const allNotifications = userIds.map((userId) => {
+        const allNotifications = users.map(user => {
             return {
-                user: userId,
-                content: content,
-                type: type,
-                isRead: false,
-                createdAt: Date.now()
+                user: user,
+                contentEnglish: contentEnglish,
+                contentHindi: contentHindi,
+                formId: formId,
+                userId: userId
             }
-        })
-
-
+        });
         const notifications = await Notification.insertMany(allNotifications);
         return notifications;
     }

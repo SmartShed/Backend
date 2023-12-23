@@ -11,6 +11,7 @@ const {
 
 const {
   createForm,
+  getOpeningForms,
   getForm,
   getAnswer,
   getAnswerOfForm,
@@ -39,6 +40,8 @@ router.get("/forms/submitted", getSubmittedFormsOfWorker);
 
 // Worker Opening APIs
 router.post("/forms/create", createForm);
+
+router.get("/forms/opening/:form_id", getOpeningForms);
 
 router.get("/forms/:form_id", getForm);
 

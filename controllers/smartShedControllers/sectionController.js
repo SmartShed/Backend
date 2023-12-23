@@ -1,4 +1,6 @@
 const SectionData = require("../../models/SectionData");
+const { createNotification, createNotifications } = require("../../helpers/notificationHelper");
+const { getAllAuthorityIds, getAllSupervisorIds, getAllWorkerIds, getSupervisorIdsBySection, getWorkerIdsBySection } = require("../../helpers/userHelper");
 
 const addSection = async (req, res) => {
   try {
@@ -18,6 +20,16 @@ const addSection = async (req, res) => {
 
     section = new SectionData({ name: name, forms: [] });
     await section.save();
+
+
+    const authorityIDs = await getAllAuthorityIds();
+    const supervisorIDs = await getAllSupervisorIds();
+
+    const notification = await createNotifications(authorityIDs, `New section added ${name}`, `नया अनुभाग जोड़ा गया ${name}`, section._id, null);
+
+    const notification2 = await createNotifications(supervisorIDs, `New section added ${name}`, `नया अनुभाग जोड़ा गया ${name}`, section._id, null);
+
+
     res.status(200).json({
       message: "Section added successfully",
       section: section,

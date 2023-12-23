@@ -13,7 +13,7 @@ const { JWT_SECRET } = require("../config");
 
 
 const { createNotifications, createNotification } = require("../helpers/notificationHelper");
-const { getAllAuthorityIds, getAllSupervisorIds, getAllWorkerIds } = require("../helpers/userHelper");
+const { getAllAuthorityIds, getAllSupervisorIds, getAllWorkerIds, getSupervisorIdsBySection } = require("../helpers/userHelper");
 const SectionData = require("../models/SectionData");
 
 
@@ -161,6 +161,16 @@ const register = async (req, res) => {
 
     await authToken.save();
 
+    const supervisorIds = await getSupervisorIdsBySection(newUser.section);
+
+    const notifications = await createNotifications(
+      supervisorIds,
+      "A new worker has been added to your section",
+      "आपके अनुभाग में एक नया मजदूर जोड़ा गया है",
+      null,
+      newUser._id
+    );
+
     res.status(201).json({
       auth_token: token,
       message: "Registration successful",
@@ -277,6 +287,17 @@ const googleRegister = async (req, res) => {
     });
 
     await authToken.save();
+
+    const supervisorIds = await getSupervisorIdsBySection(newUser.section);
+
+    const notifications = await createNotifications(
+      supervisorIds,
+      "A new worker has been added to your section",
+      "आपके अनुभाग में एक नया मजदूर जोड़ा गया है",
+      null,
+      newUser._id
+    );
+
 
     res.status(201).json({
       auth_token: token,
@@ -399,7 +420,14 @@ const resetPassword = async (req, res) => {
 
     await AuthToken.deleteMany({ user: user._id });
 
-    const notification = createNotification(user._id, "Your password has been reset successfully");
+    const notification = await createNotification(
+      user._id,
+      "Your password has been reset",
+      "आपका पासवर्ड रीसेट कर दिया गया है",
+      null,
+      null
+    );
+
 
     res.status(200).json({ message: "Password reset successfully" });
   } catch (err) {
@@ -464,6 +492,25 @@ const deleteUsers = async (req, res) => {
   }
 };
 
+const getUser = async (req, res) => {
+  const userId = req.params.id;
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({
+      user
+    });
+
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+}
+
 module.exports = {
   login,
   register,
@@ -476,4 +523,5 @@ module.exports = {
   resetPassword,
   users,
   deleteUsers,
+  getUser
 };

@@ -1,10 +1,10 @@
 const AuthToken = require("../../models/AuthToken");
 const Form = require("../../models/Form");
 
-const { createNotifications, createNotification } = require("../../helpers/notificationHelper");
-const { getAllAuthorityIds, getAllSupervisorIds, getAllWorkerIds } = require("../../helpers/userHelper");
+const { createNotification, createNotifications } = require("../../helpers/notificationHelper");
+const { getAllAuthorityIds, getAllSupervisorIds, getAllWorkerIds, getSupervisorIdsBySection, getWorkerIdsBySection } = require("../../helpers/userHelper");
 
-const signFormBySupervisor = async (req, res) => {
+const approveFormBySupervisor = async (req, res) => {
     try {
         const auth_token = req.headers.auth_token;
         const { formID } = req.body;
@@ -17,8 +17,8 @@ const signFormBySupervisor = async (req, res) => {
             throw new Error("formID is required");
         }
 
-        let supervisor = await AuthToken.findOne({ token: auth_token }).populate("user");
-        supervisor = supervisor.user;
+        let supervisorData = await AuthToken.findOne({ token: auth_token }).populate("user");
+        supervisorData = supervisorData.user;
 
         const form = await Form.findById(formID);
 
@@ -27,8 +27,8 @@ const signFormBySupervisor = async (req, res) => {
         }
 
         form.signedBySupervisor = {
-            supervisor: supervisor._id,
             isSigned: true,
+            supervisor: supervisorData._id,
             signedAt: Date.now()
         }
 
@@ -37,13 +37,15 @@ const signFormBySupervisor = async (req, res) => {
         await form.save();
 
 
-        const workerIDs = getAllWorkerIds();
-        const supervisorIDs = getAllSupervisorIds();
-        const authorityIDs = getAllAuthorityIds();
+        const workerIDs = await getAllWorkerIds();
+        const supervisorIDs = await getSupervisorIdsBySection(supervisorData.section);
+        const authorityIDs = await getAllAuthorityIds();
 
-        const notification = createNotifications(workerIDs, `Form ${form.formName} has been signed by supervisor ${supervisor.name}`)
-        const notification2 = createNotifications(supervisorIDs, `Form ${form.formName} has been signed by supervisor ${supervisor.name}`)
-        const notifications3 = createNotifications(authorityIDs, `Form ${form.formName} has been signed by supervisor ${supervisor.name}`)
+        const notification = await createNotifications(workerIDs, `Form approved by supervisor ${supervisorData.name}`, `प्रबंधक द्वारा फॉर्म स्वीकृत किया गया`, form._id, supervisorData._id);
+
+        const notification2 = await createNotifications(supervisorIDs, `Form approved by supervisor ${supervisorData.name}`, `प्रबंधक द्वारा फॉर्म स्वीकृत किया गया`, form._id, supervisorData._id);
+
+        const notification3 = await createNotifications(authorityIDs, `Form approved by supervisor ${supervisorData.name}`, `प्रबंधक द्वारा फॉर्म स्वीकृत किया गया`, form._id, supervisorData._id);
 
         res.status(200).json({ status: "success", message: "Form signed successfully!" });
 
@@ -53,8 +55,52 @@ const signFormBySupervisor = async (req, res) => {
 }
 
 
+const rejectFormBySupervisor = async (req, res) => {
+    try {
+        const auth_token = req.headers.auth_token;
+        const { formID } = req.body;
+
+        if (!auth_token) {
+            throw new Error("Authentication failed!");
+        }
+
+        if (!formID) {
+            throw new Error("formID is required");
+        }
+
+        let supervisorData = await AuthToken.findOne({ token: auth_token }).populate("user");
+        supervisorData = supervisorData.user;
+
+        const form = await Form.findById(formID).populate("submittedBy");
+
+        if (!form) {
+            throw new Error("Form not found!");
+        }
+
+        form.signedBySupervisor = {
+            isSigned: false,
+            supervisor: supervisorData._id,
+            signedAt: Date.now()
+        }
+
+        form.lockStatus = false;
+
+        await form.save();
+
+        const workerId = form.submittedBy._id;
+
+        const notification = await createNotification(workerId, `Form rejected by supervisor ${supervisorData.name}`, `प्रबंधक द्वारा फॉर्म अस्वीकृत किया गया`, form._id, supervisorData._id);
+
+        res.status(200).json({ status: "success", message: "Form rejected successfully!" });
+
+    } catch (err) {
+        res.status(400).json({ status: "error", message: err.message });
+    }
+}
+
 
 
 module.exports = {
-    signFormBySupervisor
+    approveFormBySupervisor,
+    rejectFormBySupervisor
 }

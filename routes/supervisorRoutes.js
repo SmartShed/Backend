@@ -9,7 +9,8 @@ const {
 } = require("../controllers/supervisorControllers/supervisorAccessController");
 
 const {
-    signFormBySupervisor
+    approveFormBySupervisor,
+    rejectFormBySupervisor
 } = require("../controllers/supervisorControllers/supervisorAnsweringController");
 
 
@@ -21,6 +22,7 @@ router.get("/forms/signed/:supervisorID", authorization("supervisor"), getSigned
 
 
 // Supervisor Answer Routes
-router.post("/forms/sign", authorization("supervisor"), signFormBySupervisor);
+router.post("/forms/approve", authorization("supervisor"), approveFormBySupervisor);
+router.post("/forms/reject", authorization("supervisor"), rejectFormBySupervisor);
 
 module.exports = router;

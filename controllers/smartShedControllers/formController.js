@@ -34,6 +34,25 @@ const addForm = async (req, res) => {
     section.forms.push(form._id);
     await section.save();
 
+    const authorityIDs = await getAllAuthorityIds();
+    const supervisorIDs = await getAllSupervisorIds();
+
+    const notification = await createNotifications(
+      authorityIDs,
+      `New form added ${title} in section ${section.name}`,
+      `नया फॉर्म जोड़ा गया ${title} अनुभाग में ${section.name}`,
+      form._id,
+      null
+    );
+
+    const notification2 = await createNotifications(
+      supervisorIDs,
+      `New form added ${title} in section ${section.name}`,
+      `नया फॉर्म जोड़ा गया ${title} अनुभाग में ${section.name}`,
+      form._id,
+      null
+    );
+
     res.status(200).json({
       message: "Form added successfully",
       form: form,

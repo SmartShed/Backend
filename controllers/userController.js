@@ -27,6 +27,7 @@ const registerSchema = Joi.object({
   password: Joi.string().required().min(6).max(20),
   name: Joi.string().required(),
   position: Joi.string().valid("authority", "supervisor", "worker").required(),
+  section: Joi.string().allow(""),
 });
 
 const logoutSchema = Joi.object({
@@ -41,6 +42,7 @@ const googleRegisterSchema = Joi.object({
   email: Joi.string().email().required(),
   name: Joi.string().required(),
   position: Joi.string().valid("authority", "supervisor", "worker").required(),
+  section: Joi.string().allow(""),
 });
 
 const validateRequest = (req, schema) => {

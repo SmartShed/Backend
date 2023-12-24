@@ -106,7 +106,7 @@ const register = async (req, res) => {
   try {
     validateRequest(req, registerSchema);
 
-    const { email, password, name, position, section } = req.body;
+    let { email, password, name, position, section } = req.body;
 
     if (position !== "authority" && !section) {
       return res.status(400).json({
@@ -245,7 +245,7 @@ const googleRegister = async (req, res) => {
   try {
     validateRequest(req, googleRegisterSchema);
 
-    const { email, name, position, section } = req.body;
+    let { email, name, position, section } = req.body;
 
     if (position !== "authority" && !section) {
       return res.status(400).json({

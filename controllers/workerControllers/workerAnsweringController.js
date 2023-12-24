@@ -145,6 +145,12 @@ const submitForm = async (req, res) => {
 
     const workerIds = form.access;
 
+    workerIds.forEach(async (workerId) => {
+      let worker = await User.findById(workerId);
+      worker.forms = worker.forms.filter((formId) => formId != form_id);
+      await worker.save();
+    });
+
     const questionsArray = form.questions.concat(
       form.subForms.map((subForm) => subForm.questions).flat()
     );
@@ -195,18 +201,6 @@ const submitForm = async (req, res) => {
     }
     form.updatedAt = Date.now();
     await form.save();
-
-    workerIds.forEach(async (workerId) => {
-      const user = await User.findById(workerId);
-      if (user) {
-        user.forms = user.forms.filter((form) => form != form_id);
-        await user.save();
-      }
-    });
-
-    user.forms = user.forms.filter((form) => form != form_id);
-
-    await user.save();
 
     await createNotifications(
       workerIds,

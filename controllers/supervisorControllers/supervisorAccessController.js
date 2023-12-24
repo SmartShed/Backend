@@ -113,8 +113,10 @@ const getSignedFormsOfSuperVisor = async (req, res) => {
       };
     });
 
-    console.log(forms);
-    res.status(200).json(forms);
+    res.status(200).json({
+      message: "Forms fetched successfully",
+      forms: forms,
+    });
   } catch (err) {
     res.status(400).json({ status: "error", message: err.message });
   }

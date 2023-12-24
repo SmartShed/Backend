@@ -1,9 +1,10 @@
 const Form = require("../../models/Form");
 const Question = require("../../models/Question");
 const AuthToken = require("../../models/AuthToken");
+const User = require("../../models/User");
 
-const { createNotifications, createNotification } = require("../../helpers/notificationHelper");
-const { getAllAuthorityIds, getAllSupervisorIds, getAllWorkerIds, getSupervisorIdsBySection, getWorkerIdsBySection } = require("../../helpers/userHelper");
+const { createNotifications } = require("../../helpers/notificationHelper");
+const { getAllSupervisorIds } = require("../../helpers/userHelper");
 
 const createDraft = async (req, res) => {
   const form_id = req.params.form_id;
@@ -36,6 +37,18 @@ const createDraft = async (req, res) => {
       return res
         .status(404)
         .json({ status: "error", message: "Form not found" });
+    }
+
+    // Push form id to user's forms array if not already present
+    if (!user.forms.includes(form_id)) {
+      user.forms.push(form_id);
+      await user.save();
+    }
+
+    // Check if user has access to this form
+    if (!form.access.includes(user._id)) {
+      form.access.push(user._id);
+      await form.save();
     }
 
     const questionsArray = await Question.find({
@@ -99,8 +112,6 @@ const submitForm = async (req, res) => {
   const { answers } = req.body;
 
   try {
-
-
     let user = await AuthToken.findOne({ token: auth_token }).populate("user");
     user = user.user;
 
@@ -120,8 +131,6 @@ const submitForm = async (req, res) => {
       })
       .populate("history");
 
-
-
     if (!form) {
       return res
         .status(404)
@@ -129,9 +138,10 @@ const submitForm = async (req, res) => {
     }
 
     if (form.lockStatus) {
-      return res.status(400).json({ status: "error", message: "Form is locked" });
+      return res
+        .status(400)
+        .json({ status: "error", message: "Form is locked" });
     }
-
 
     const workerIds = form.access;
 
@@ -186,14 +196,19 @@ const submitForm = async (req, res) => {
     form.updatedAt = Date.now();
     await form.save();
 
-
-
+    workerIds.forEach(async (workerId) => {
+      const user = await User.findById(workerId);
+      if (user) {
+        user.forms = user.forms.filter((form) => form != form_id);
+        await user.save();
+      }
+    });
 
     user.forms = user.forms.filter((form) => form != form_id);
 
     await user.save();
 
-    const notifications = await createNotifications(
+    await createNotifications(
       workerIds,
       `Form ${form.title} for loco ${form.locoNumber} loconame ${form.locoName} submitted by ${user.name}`,
       `लोको ${form.locoNumber} लोको नाम ${form.locoName} द्वारा ${user.name} द्वारा जमा किया गया फॉर्म ${form.title}`,
@@ -203,7 +218,7 @@ const submitForm = async (req, res) => {
 
     const supervisorIDs = await getAllSupervisorIds();
 
-    const notification2 = await createNotifications(
+    await createNotifications(
       supervisorIDs,
       `Form ${form.title} for loco ${form.locoNumber} loconame ${form.locoName} submitted by ${user.name}`,
       `लोको ${form.locoNumber} लोको नाम ${form.locoName} द्वारा ${user.name} द्वारा जमा किया गया फॉर्म ${form.title}`,

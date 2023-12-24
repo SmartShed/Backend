@@ -16,10 +16,7 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   isGoogle: { type: Boolean, default: false },
   forms: [{ type: mongoose.Types.ObjectId, ref: "Form" }],
+  isDeleted: { type: Boolean, default: false },
 });
 
 module.exports = mongoose.model("User", userSchema);
-
-
-
-

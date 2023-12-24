@@ -1,27 +1,26 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
-const AuthToken = require("../models/AuthToken");
 
+const AuthToken = require("../models/AuthToken");
 const EmployeeEmail = require("../models/EmployeeEmail");
 const Otp = require("../models/Otp");
-const SecitonData = require("../models/SectionData");
+const SectionData = require("../models/SectionData");
 const Joi = require("joi");
 
 const { sendMail } = require("../helpers");
 const { JWT_SECRET } = require("../config");
 
-
-const { createNotifications, createNotification } = require("../helpers/notificationHelper");
-const { getAllAuthorityIds, getAllSupervisorIds, getAllWorkerIds, getSupervisorIdsBySection } = require("../helpers/userHelper");
-const SectionData = require("../models/SectionData");
-
+const {
+  createNotifications,
+  createNotification,
+} = require("../helpers/notificationHelper");
+const { getSupervisorIdsBySection } = require("../helpers/userHelper");
 
 const loginSchema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().required(),
 });
-
 
 const registerSchema = Joi.object({
   email: Joi.string().email().required(),
@@ -31,7 +30,7 @@ const registerSchema = Joi.object({
   section: Joi.string().valid(async () => {
     const sectionData = await SectionData.find();
     return sectionData.map((section) => section.name);
-  }).required(),
+  }),
 });
 
 const logoutSchema = Joi.object({
@@ -49,7 +48,7 @@ const googleRegisterSchema = Joi.object({
   section: Joi.string().valid(async () => {
     const sectionData = await SectionData.find();
     return sectionData.map((section) => section.name);
-  }).required(),
+  }),
 });
 
 const validateRequest = (req, schema) => {
@@ -67,7 +66,7 @@ const login = async (req, res) => {
     validateRequest(req, loginSchema);
 
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email, isDeleted: false });
 
     if (!user) {
       return res.status(400).json({
@@ -163,7 +162,7 @@ const register = async (req, res) => {
 
     const supervisorIds = await getSupervisorIdsBySection(newUser.section);
 
-    const notifications = await createNotifications(
+    await createNotifications(
       supervisorIds,
       "A new worker has been added to your section",
       "आपके अनुभाग में एक नया मजदूर जोड़ा गया है",
@@ -191,9 +190,7 @@ const logout = async (req, res) => {
     validateRequest(req.headers, logoutSchema);
 
     const { auth_token } = req.headers;
-
     const authToken = await AuthToken.findOne({ token: auth_token });
-
     await AuthToken.deleteOne(authToken);
 
     res.status(200).json({
@@ -209,7 +206,7 @@ const googleLogin = async (req, res) => {
     validateRequest(req, googleLoginSchema);
 
     const { email } = req.body;
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email, isDeleted: false });
     if (!user) {
       return res.status(400).json({
         message: "User not found",
@@ -298,7 +295,6 @@ const googleRegister = async (req, res) => {
       newUser._id
     );
 
-
     res.status(201).json({
       auth_token: token,
       message: "Registration successful",
@@ -363,7 +359,6 @@ const forgotPassword = async (req, res) => {
     const newOtp = new Otp({
       otp,
       email,
-      expireAt: Date.now() + 5 * 60 * 1000,
     });
 
     await newOtp.save();
@@ -384,16 +379,11 @@ const forgotPassword = async (req, res) => {
 const validateOTP = async (req, res) => {
   try {
     const { email, otp } = req.body;
-    await Otp.deleteMany({ expireAt: { $lt: Date.now() } });
 
     const otpInstance = await Otp.findOne({ email, otp });
 
     if (!otpInstance) {
       return res.status(400).json({ message: "Invalid OTP" });
-    }
-
-    if (otpInstance.expireAt < Date.now()) {
-      return res.status(400).json({ message: "OTP expired" });
     }
 
     res.status(200).json({ message: "OTP validated successfully" });
@@ -420,14 +410,13 @@ const resetPassword = async (req, res) => {
 
     await AuthToken.deleteMany({ user: user._id });
 
-    const notification = await createNotification(
+    await createNotification(
       user._id,
       "Your password has been reset",
       "आपका पासवर्ड रीसेट कर दिया गया है",
       null,
       null
     );
-
 
     res.status(200).json({ message: "Password reset successfully" });
   } catch (err) {
@@ -477,12 +466,16 @@ const users = async (req, res) => {
   }
 };
 
-
 const deleteUsers = async (req, res) => {
   try {
     const { users } = req.body;
 
-    await User.deleteMany({ _id: { $in: users } });
+    const dbUsers = await User.find({ _id: { $in: users } });
+
+    dbUsers.forEach(async (user) => {
+      user.isDeleted = true;
+      await user.save();
+    });
 
     await AuthToken.deleteMany({ user: { $in: users } });
 
@@ -503,13 +496,12 @@ const getUser = async (req, res) => {
     }
 
     return res.status(200).json({
-      user
+      user,
     });
-
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
-}
+};
 
 module.exports = {
   login,
@@ -523,5 +515,5 @@ module.exports = {
   resetPassword,
   users,
   deleteUsers,
-  getUser
+  getUser,
 };

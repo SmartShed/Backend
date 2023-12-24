@@ -1,74 +1,80 @@
 const User = require("../models/User");
 
 const getAllWorkerIds = async () => {
-    try {
-        const workers = await User.find({ position: "worker" });
+  try {
+    const workers = await User.find({ position: "worker" });
 
-        const workerIds = workers.map((worker) => worker._id);
+    const workerIds = workers.map((worker) => worker._id);
 
-        return workerIds;
-
-
-    } catch (error) {
-        console.error(error);
-        throw new Error(error.message);
-    }
-}
+    return workerIds;
+  } catch (error) {
+    console.error(error);
+    throw new Error(error.message);
+  }
+};
 
 const getAllSupervisorIds = async () => {
-    try {
-        const supervisors = await User.find({ position: "supervisor" });
+  try {
+    const supervisors = await User.find({ position: "supervisor" });
 
-        const supervisorIds = supervisors.map((supervisor) => supervisor._id);
+    const supervisorIds = supervisors.map((supervisor) => supervisor._id);
 
-        return supervisorIds;
-
-    } catch (error) {
-        console.error(error);
-        throw new Error(error.message);
-    }
-}
+    return supervisorIds;
+  } catch (error) {
+    console.error(error);
+    throw new Error(error.message);
+  }
+};
 
 const getAllAuthorityIds = async () => {
-    try {
-        const authorities = await User.find({ position: "authority" });
+  try {
+    const authorities = await User.find({ position: "authority" });
 
-        const authorityIds = authorities.map((authority) => authority._id);
+    const authorityIds = authorities.map((authority) => authority._id);
 
-        return authorityIds;
-
-    } catch (error) {
-        console.error(error);
-        throw new Error(error.message);
-    }
-}
+    return authorityIds;
+  } catch (error) {
+    console.error(error);
+    throw new Error(error.message);
+  }
+};
 
 const getWorkerIdsBySection = async (sectionName) => {
-    try {
-        const workers = await User.find({ position: "worker", section: sectionName });
+  try {
+    const workers = await User.find({
+      position: "worker",
+      section: sectionName,
+    });
 
-        const workerIds = workers.map((worker) => worker._id);
+    const workerIds = workers.map((worker) => worker._id);
 
-        return workerIds;
-
-    } catch (error) {
-        console.error(error);
-        throw new Error(error.message);
-    }
-}
+    return workerIds;
+  } catch (error) {
+    console.error(error);
+    throw new Error(error.message);
+  }
+};
 
 const getSupervisorIdsBySection = async (sectionName) => {
-    try {
-        const supervisors = await User.find({ position: "supervisor", section: sectionName });
+  try {
+    const supervisors = await User.find({
+      position: "supervisor",
+      section: sectionName,
+    });
 
-        const supervisorIds = supervisors.map((supervisor) => supervisor._id);
+    const supervisorIds = supervisors.map((supervisor) => supervisor._id);
 
-        return supervisorIds;
+    return supervisorIds;
+  } catch (error) {
+    console.error(error);
+    throw new Error(error.message);
+  }
+};
 
-    } catch (error) {
-        console.error(error);
-        throw new Error(error.message);
-    }
-}
-
-module.exports = { getAllWorkerIds, getAllSupervisorIds, getAllAuthorityIds, getWorkerIdsBySection, getSupervisorIdsBySection };
+module.exports = {
+  getAllWorkerIds,
+  getAllSupervisorIds,
+  getAllAuthorityIds,
+  getWorkerIdsBySection,
+  getSupervisorIdsBySection,
+};

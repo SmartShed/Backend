@@ -131,7 +131,7 @@ const getRecentFormsBySectionId = async (req, res) => {
           id: user._id,
           name: user.name,
           section: user.section,
-        }
+        },
       };
     });
 
@@ -224,14 +224,15 @@ const getRecentFormsBySectionName = async (req, res) => {
 
 const getSubmittedFormsOfWorker = async (req, res) => {
   try {
-
     const auth_token = req.headers.auth_token;
 
     if (!auth_token) {
       throw new Error("Auth token not found");
     }
 
-    let worker = await AuthToken.findOne({ token: auth_token }).populate("user");
+    let worker = await AuthToken.findOne({ token: auth_token }).populate(
+      "user"
+    );
 
     if (!worker) {
       throw new Error("Invalid auth token");
@@ -246,7 +247,7 @@ const getSubmittedFormsOfWorker = async (req, res) => {
 
     const formsWithAccess = await Form.find({
       access: { $in: [workerId] },
-      submittedBy: { $ne: workerId }
+      submittedBy: { $ne: workerId },
     });
 
     console.log(formsWithAccess);

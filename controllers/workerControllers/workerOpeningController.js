@@ -2,13 +2,12 @@ const Form = require("../../models/Form");
 const FormData = require("../../models/FormData");
 const AuthToken = require("../../models/AuthToken");
 const Question = require("../../models/Question");
-const QuestionData = require("../../models/QuestionData");
 const User = require("../../models/User");
 const SubFormData = require("../../models/SubFormData");
 const SubForm = require("../../models/SubForm");
 
-const { createNotifications, createNotification } = require("../../helpers/notificationHelper");
-const { getAllAuthorityIds, getAllSupervisorIds, getAllWorkerIds } = require("../../helpers/userHelper");
+const { createNotifications } = require("../../helpers/notificationHelper");
+const { getAllWorkerIds } = require("../../helpers/userHelper");
 
 const createForm = async (req, res) => {
   // const form_id = req.params.form_id;
@@ -138,8 +137,6 @@ const createForm = async (req, res) => {
 
     await user.save();
 
-
-
     const resForm = {
       id: newForm._id,
       title: newForm.title,
@@ -159,14 +156,13 @@ const createForm = async (req, res) => {
 
     const workerIds = await getAllWorkerIds();
 
-    const notification = createNotification(
+    await createNotifications(
       workerIds,
       `New form opened ${newForm.title} for ${newForm.locoName} ${newForm.locoNumber} by ${user.name}`,
       `नया फॉर्म खोला गया ${newForm.title} ${newForm.locoName} ${newForm.locoNumber} द्वारा ${user.name}`,
       newForm._id,
       user._id
     );
-
 
     res.status(201).json({
       message: "Form created successfully",
@@ -177,12 +173,19 @@ const createForm = async (req, res) => {
   }
 };
 
-
 const getOpeningForms = async (req, res) => {
   const { form_id } = req.params;
 
   try {
-    const form = FormData.findById(form_id).populate("questions").populate("subForms").populate("subForms.questions");
+    const form = await FormData.findById(form_id)
+      .populate("questions")
+      .populate({
+        path: "subForms",
+        populate: {
+          path: "questions",
+          model: "QuestionData",
+        },
+      });
 
     if (!form) {
       return res.status(400).json({ message: "Form does not exist" });
@@ -192,15 +195,10 @@ const getOpeningForms = async (req, res) => {
       message: "Form retrieved successfully",
       form: form,
     });
-
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
-
-
-
-
 
 const getForm = async (req, res) => {
   try {
@@ -233,6 +231,7 @@ const getForm = async (req, res) => {
     };
     const history = form.history.map((h) => ({
       editedBy: h.editedBy.name,
+      section: h.editedBy.section,
       editedAt: h.editedAt,
       changes: h.changes,
     }));

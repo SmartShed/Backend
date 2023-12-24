@@ -1,6 +1,13 @@
 const SectionData = require("../../models/SectionData");
 const FormData = require("../../models/FormData");
 
+const { createNotifications } = require("../../helpers/notificationHelper");
+
+const {
+  getAllAuthorityIds,
+  getAllSupervisorIds,
+} = require("../../helpers/userHelper");
+
 const addForm = async (req, res) => {
   try {
     let { title, descriptionHindi, descriptionEnglish, sectionName } = req.body;
@@ -38,7 +45,7 @@ const addForm = async (req, res) => {
     const authorityIDs = await getAllAuthorityIds();
     const supervisorIDs = await getAllSupervisorIds();
 
-    const notification = await createNotifications(
+    await createNotifications(
       authorityIDs,
       `New form added ${title} in section ${section.name}`,
       `नया फॉर्म जोड़ा गया ${title} अनुभाग में ${section.name}`,
@@ -46,7 +53,7 @@ const addForm = async (req, res) => {
       null
     );
 
-    const notification2 = await createNotifications(
+    await createNotifications(
       supervisorIDs,
       `New form added ${title} in section ${section.name}`,
       `नया फॉर्म जोड़ा गया ${title} अनुभाग में ${section.name}`,

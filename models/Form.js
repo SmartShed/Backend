@@ -14,28 +14,24 @@ const formSchema = new mongoose.Schema({
   signedBySupervisor: {
     isSigned: {
       type: Boolean,
-      default: false
+      default: false,
     },
-    supervisor:
-    {
+    supervisor: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-    }
-    ,
+      ref: "User",
+    },
     signedAt: { type: Date, default: Date.now },
   },
   signedByAuthority: {
     isSigned: {
       type: Boolean,
-      default: false
+      default: false,
     },
-    authority:
-    {
+    authority: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
     },
     signedAt: { type: Date, default: Date.now },
-
   },
   access: [{ type: mongoose.Types.ObjectId, ref: "User" }],
   createdBy: { type: mongoose.Types.ObjectId, ref: "User" },

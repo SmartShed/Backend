@@ -22,9 +22,6 @@ const {
   submitForm,
 } = require("../controllers/workerControllers/workerAnsweringController");
 
-// Form Access APIs
-router.get("/forms", getRecentForms);
-
 router.get("/section/:section_param/forms", (req, res) => {
   const sectionParam = req.params.section_param;
 
@@ -36,22 +33,19 @@ router.get("/section/:section_param/forms", (req, res) => {
   }
 });
 
+// Form Access APIs
+router.get("/forms", getRecentForms);
 router.get("/forms/submitted", getSubmittedFormsOfWorker);
 
 // Worker Opening APIs
 router.post("/forms/create", createForm);
-
 router.get("/forms/opening/:form_id", getOpeningForms);
-
 router.get("/forms/:form_id", getForm);
-
 router.get("/forms/:form_id/questions/:question_id", getAnswer);
-
 router.get("/forms/:form_id/answers", getAnswerOfForm);
 
 // Worker Answering APIs
 router.post("/forms/:form_id/draft", createDraft);
-
 router.post("/forms/:form_id/submit", submitForm);
 
 module.exports = router;

@@ -176,7 +176,7 @@ const getOpenedFormsBySectionName = async (req, res) => {
           id: form.createdBy._id,
           name: form.createdBy.name,
           section: form.createdBy.section,
-        }
+        },
       };
     });
 

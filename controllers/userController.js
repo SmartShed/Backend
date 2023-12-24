@@ -27,10 +27,6 @@ const registerSchema = Joi.object({
   password: Joi.string().required().min(6).max(20),
   name: Joi.string().required(),
   position: Joi.string().valid("authority", "supervisor", "worker").required(),
-  section: Joi.string().valid(async () => {
-    const sectionData = await SectionData.find();
-    return sectionData.map((section) => section.name);
-  }),
 });
 
 const logoutSchema = Joi.object({
@@ -45,10 +41,6 @@ const googleRegisterSchema = Joi.object({
   email: Joi.string().email().required(),
   name: Joi.string().required(),
   position: Joi.string().valid("authority", "supervisor", "worker").required(),
-  section: Joi.string().valid(async () => {
-    const sectionData = await SectionData.find();
-    return sectionData.map((section) => section.name);
-  }),
 });
 
 const validateRequest = (req, schema) => {
@@ -113,6 +105,16 @@ const register = async (req, res) => {
     validateRequest(req, registerSchema);
 
     const { email, password, name, position, section } = req.body;
+
+    if (position !== "authority" && !section) {
+      return res.status(400).json({
+        message: "Section is required for non-authority positions",
+      });
+    }
+
+    if (position === "authority") {
+      section = "";
+    }
 
     const validEmails = await EmployeeEmail.findOne();
 
@@ -242,6 +244,16 @@ const googleRegister = async (req, res) => {
     validateRequest(req, googleRegisterSchema);
 
     const { email, name, position, section } = req.body;
+
+    if (position !== "authority" && !section) {
+      return res.status(400).json({
+        message: "Section is required for non-authority positions",
+      });
+    }
+
+    if (position === "authority") {
+      section = "";
+    }
 
     const validEmails = await EmployeeEmail.findOne();
 

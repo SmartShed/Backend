@@ -58,9 +58,9 @@ const getFormsBySectionName = async (req, res) => {
   try {
     const sectionName = req.params.section_param;
 
-    const section = await SectionData.findOne({ name: sectionName }).populate(
-      "forms"
-    );
+    const section = await SectionData.findOne({ name: sectionName })
+      .populate("forms")
+      .sort({ updatedAt: -1 });
 
     if (!section) {
       return res.status(404).json({
@@ -148,9 +148,9 @@ const getOpenedFormsBySectionName = async (req, res) => {
 
     const formIds = section.forms;
 
-    let forms = await Form.find({ formID: { $in: formIds } }).populate(
-      "createdBy"
-    );
+    let forms = await Form.find({ formID: { $in: formIds } })
+      .populate("createdBy")
+      .sort({ updatedAt: -1 });
 
     if (!forms.length) {
       return res.status(200).json({

@@ -33,9 +33,7 @@ const getRecentForms = async (req, res) => {
     const formIds = user.forms;
 
     let forms = await Form.find({ _id: { $in: formIds } })
-      .sort({
-        updatedAt: -1,
-      })
+      .sort({ updatedAt: -1 })
       .populate("createdBy");
 
     forms = forms.map((form) => {

@@ -163,9 +163,9 @@ const getRecentFormsBySectionName = async (req, res) => {
 
     const formIds = section.forms;
 
-    let forms = await Form.find({ formID: { $in: formIds } }).populate(
-      "createdBy"
-    );
+    let forms = await Form.find({ formID: { $in: formIds } })
+      .populate("createdBy")
+      .sort({ updatedAt: -1 });
 
     let newForms = [];
 

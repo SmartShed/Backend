@@ -58,10 +58,9 @@ const getFormsBySectionName = async (req, res) => {
   try {
     const sectionName = req.params.section_param;
 
-    const section = await SectionData.findOne({ name: sectionName })
-      .populate("forms")
-      .sort({ updatedAt: -1 });
-
+    const section = await SectionData.findOne({ name: sectionName }).populate(
+      "forms"
+    );
     if (!section) {
       return res.status(404).json({
         message: "No Forms found",

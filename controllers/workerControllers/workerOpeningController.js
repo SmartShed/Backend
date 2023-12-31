@@ -10,14 +10,11 @@ const { createNotifications } = require("../../helpers/notificationHelper");
 const { getAllWorkerIds } = require("../../helpers/userHelper");
 
 const createForm = async (req, res) => {
-  // const form_id = req.params.form_id;
   const auth_token = req.headers.auth_token;
 
   const { form_id, loco_name, loco_number } = req.body;
 
   try {
-    // find user using auth_token
-
     let user = await AuthToken.findOne(
       { token: auth_token },
       { user: 1 }
@@ -32,20 +29,24 @@ const createForm = async (req, res) => {
     const formdata = await FormData.findById(form_id)
       .populate("questions")
       .populate("subForms")
-      .populate("subForms.questions");
+      .populate({
+        path: "subForms",
+        populate: {
+          path: "questions",
+        },
+      });
 
     const questions = formdata.questions;
     const subforms = formdata.subForms;
 
-    // creating questions for subforms
     let subformsData = [];
     let subformsIDs = [];
 
+    const bulkOperations = [];
+
     for (let i = 0; i < subforms.length; i++) {
+      const subform = subforms[i];
       let subformQuestions = [];
-      const subform = await SubFormData.findById(subforms[i]._id).populate(
-        "questions"
-      );
 
       let questionIDs = [];
       for (let j = 0; j < subform.questions.length; j++) {
@@ -76,8 +77,6 @@ const createForm = async (req, res) => {
         formID: formdata._id,
       });
 
-      await newSubform.save();
-
       subformsIDs.push(newSubform._id);
 
       subformsData.push({
@@ -89,7 +88,15 @@ const createForm = async (req, res) => {
         questions: subformQuestions,
         formID: subform.formID,
       });
+
+      bulkOperations.push({
+        insertOne: {
+          document: newSubform,
+        },
+      });
     }
+
+    await SubForm.bulkWrite(bulkOperations);
 
     // creating questions for form
     let questionsData = [];
@@ -204,6 +211,31 @@ const getForm = async (req, res) => {
   try {
     const form_id = req.params.form_id;
 
+    /*
+    signedBySupervisor: {
+      isSigned: {
+        type: Boolean,
+        default: false,
+      },
+      supervisor: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+      signedAt: { type: Date, default: Date.now },
+    },
+    signedByAuthority: {
+      isSigned: {
+        type: Boolean,
+        default: false,
+      },
+      authority: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+      signedAt: { type: Date, default: Date.now },
+    },
+    */
+
     const form = await Form.findById(form_id)
       .populate("questions")
       .populate({
@@ -213,22 +245,35 @@ const getForm = async (req, res) => {
           model: "Question",
         },
       })
-      .populate("createdBy")
+      .populate("createdBy", "_id name section")
       .populate({
         path: "history.editedBy",
         model: "User",
-        select: "name section",
+        select: "_id name section",
+      })
+      .populate({
+        path: "signedBySupervisor",
+        populate: {
+          path: "supervisor",
+          model: "User",
+          select: "_id name section",
+        },
+        match: { "signedBySupervisor.isSigned": true },
+      })
+      .populate({
+        path: "signedByAuthority",
+        populate: {
+          path: "authority",
+          model: "User",
+          select: "_id name section",
+        },
+        match: { "signedByAuthority.isSigned": true },
       });
 
     if (!form) {
       return res.status(404).json({ message: "Form not found" });
     }
 
-    const createdBy = {
-      id: form.createdBy._id,
-      name: form.createdBy.name,
-      section: form.createdBy.section,
-    };
     const history = form.history.map((h) => ({
       editedBy: h.editedBy.name,
       section: h.editedBy.section,
@@ -240,7 +285,6 @@ const getForm = async (req, res) => {
       message: "Form retrieved successfully",
       form: {
         ...form._doc,
-        createdBy,
         history,
       },
     });

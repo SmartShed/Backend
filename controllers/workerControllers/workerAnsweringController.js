@@ -18,9 +18,7 @@ const createDraft = async (req, res) => {
     user = user.user;
 
     if (!user) {
-      return res
-        .status(401)
-        .json({ status: "error", message: "Unauthorized access" });
+      return res.status(401).json({ message: "Unauthorized access" });
     }
 
     const form = await Form.findById(form_id)
@@ -34,9 +32,7 @@ const createDraft = async (req, res) => {
       .populate("history");
 
     if (!form) {
-      return res
-        .status(404)
-        .json({ status: "error", message: "Form not found" });
+      return res.status(404).json({ message: "Form not found" });
     }
 
     // Push form id to user's forms array if not already present
@@ -97,10 +93,10 @@ const createDraft = async (req, res) => {
       await form.save();
     }
 
-    return res.json({ status: "success", message: "Draft saved successfully" });
+    return res.json({ message: "Draft saved successfully" });
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ status: "error", message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };
 
@@ -116,9 +112,7 @@ const submitForm = async (req, res) => {
     user = user.user;
 
     if (!user) {
-      return res
-        .status(401)
-        .json({ status: "error", message: "Unauthorized access" });
+      return res.status(401).json({ message: "Unauthorized access" });
     }
 
     const form = await Form.findById(form_id)
@@ -132,15 +126,11 @@ const submitForm = async (req, res) => {
       .populate("history");
 
     if (!form) {
-      return res
-        .status(404)
-        .json({ status: "error", message: "Form not found" });
+      return res.status(404).json({ message: "Form not found" });
     }
 
     if (form.lockStatus) {
-      return res
-        .status(400)
-        .json({ status: "error", message: "Form is locked" });
+      return res.status(400).json({ message: "Form is locked" });
     }
 
     const workerIds = form.access;
@@ -221,11 +211,10 @@ const submitForm = async (req, res) => {
     );
 
     return res.json({
-      status: "success",
       message: "Form submitted successfully",
     });
   } catch (err) {
-    return res.status(500).json({ status: "error", message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };
 

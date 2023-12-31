@@ -75,11 +75,9 @@ const approveFormBySupervisor = async (req, res) => {
       supervisorData._id
     );
 
-    res
-      .status(200)
-      .json({ status: "success", message: "Form signed successfully!" });
+    res.status(200).json({ message: "Form signed successfully!" });
   } catch (err) {
-    res.status(400).json({ status: "error", message: err.message });
+    res.status(400).json({ message: err.message });
   }
 };
 
@@ -127,11 +125,9 @@ const rejectFormBySupervisor = async (req, res) => {
       supervisorData._id
     );
 
-    res
-      .status(200)
-      .json({ status: "success", message: "Form rejected successfully!" });
+    res.status(200).json({ message: "Form rejected successfully!" });
   } catch (err) {
-    res.status(400).json({ status: "error", message: err.message });
+    res.status(400).json({ message: err.message });
   }
 };
 

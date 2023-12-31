@@ -104,7 +104,6 @@ const getOpenedFormsBySectionId = async (req, res) => {
 
     if (!forms.length) {
       return res.status(200).json({
-        status: "success",
         message: "No forms found",
         forms: [],
       });
@@ -129,12 +128,11 @@ const getOpenedFormsBySectionId = async (req, res) => {
     });
 
     res.status(200).json({
-      status: "success",
       message: "Forms fetched successfully",
       forms: forms,
     });
   } catch (err) {
-    res.status(400).json({ status: "error", message: err.message });
+    res.status(400).json({ message: err.message });
   }
 };
 
@@ -156,7 +154,6 @@ const getOpenedFormsBySectionName = async (req, res) => {
 
     if (!forms.length) {
       return res.status(200).json({
-        status: "success",
         message: "No forms found",
         forms: [],
       });
@@ -181,12 +178,11 @@ const getOpenedFormsBySectionName = async (req, res) => {
     });
 
     res.status(200).json({
-      status: "success",
       message: "Forms fetched successfully",
       forms: forms,
     });
   } catch (err) {
-    res.status(400).json({ status: "error", message: err.message });
+    res.status(400).json({ message: err.message });
   }
 };
 

@@ -25,7 +25,6 @@ const getRecentForms = async (req, res) => {
 
     if (!user.forms.length) {
       return res.status(200).json({
-        status: "success",
         message: "No forms found",
         forms: [],
       });
@@ -59,13 +58,12 @@ const getRecentForms = async (req, res) => {
     });
 
     const response = {
-      status: "success",
       message: "Forms fetched successfully",
       forms: forms,
     };
     res.status(200).json(response);
   } catch (err) {
-    res.status(400).json({ status: "error", message: err.message });
+    res.status(400).json({ message: err.message });
   }
 };
 
@@ -111,7 +109,6 @@ const getRecentFormsBySectionId = async (req, res) => {
 
     if (!newForms.length) {
       return res.status(200).json({
-        status: "success",
         message: "No forms found",
         forms: [],
       });
@@ -136,12 +133,11 @@ const getRecentFormsBySectionId = async (req, res) => {
     });
 
     res.status(200).json({
-      status: "success",
       message: "Forms fetched successfully",
       forms: newForms,
     });
   } catch (err) {
-    res.status(400).json({ status: "error", message: err.message });
+    res.status(400).json({ message: err.message });
   }
 };
 
@@ -187,7 +183,6 @@ const getRecentFormsBySectionName = async (req, res) => {
 
     if (!newForms.length) {
       return res.status(200).json({
-        status: "success",
         message: "No forms found",
         forms: [],
       });
@@ -213,7 +208,6 @@ const getRecentFormsBySectionName = async (req, res) => {
     });
 
     res.status(200).json({
-      status: "success",
       message: "Forms fetched successfully",
       forms: newForms,
     });
@@ -253,12 +247,11 @@ const getSubmittedFormsOfWorker = async (req, res) => {
     console.log(formsWithAccess);
 
     res.status(200).json({
-      status: "success",
       message: "Forms fetched successfully",
       forms: [...submittedForms, ...formsWithAccess],
     });
   } catch (error) {
-    res.status(400).json({ status: "error", message: error.message });
+    res.status(400).json({ message: error.message });
   }
 };
 

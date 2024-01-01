@@ -35,6 +35,10 @@ const approveFormBySupervisor = async (req, res) => {
       throw new Error("Form not found!");
     }
 
+    if (form.signedBySupervisor.isSigned) {
+      return res.status(400).json({ message: "Form already signed!" });
+    }
+
     form.signedBySupervisor = {
       isSigned: true,
       supervisor: supervisorData._id,

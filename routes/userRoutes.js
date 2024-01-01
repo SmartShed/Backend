@@ -12,6 +12,7 @@ const {
   validateOTP,
   resetPassword,
   getUser,
+  isAuthTokenValid,
 } = require("../controllers/userController");
 
 router.post("/login", login);
@@ -24,5 +25,6 @@ router.post("/forgot-password", forgotPassword);
 router.post("/validate-otp", validateOTP);
 router.post("/reset-password", resetPassword);
 router.get("/getuser/:id", getUser);
+router.get("/validate", isAuthTokenValid);
 
 module.exports = router;

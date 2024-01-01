@@ -517,6 +517,33 @@ const getUser = async (req, res) => {
   }
 };
 
+const isAuthTokenValid = async (req, res) => {
+  try {
+    const { auth_token } = req.headers;
+
+    if (!auth_token) {
+      return res.status(400).json({ isAuthTokenValid: false });
+    }
+
+    const user_auth = await AuthToken.findOne(
+      { token: auth_token },
+      { user: 1 }
+    ).populate("user");
+
+    if (!user_auth) {
+      return res.status(400).json({ isAuthTokenValid: false });
+    }
+
+    if (user_auth.user.isDeleted) {
+      return res.status(400).json({ isAuthTokenValid: false });
+    }
+
+    return res.status(200).json({ isAuthTokenValid: true });
+  } catch (err) {
+    res.status(400).json({ isAuthTokenValid: false });
+  }
+};
+
 module.exports = {
   login,
   register,
@@ -530,4 +557,5 @@ module.exports = {
   users,
   deleteUsers,
   getUser,
+  isAuthTokenValid,
 };

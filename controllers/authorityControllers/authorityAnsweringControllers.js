@@ -30,6 +30,10 @@ const approveFormByAuthority = async (req, res) => {
       throw new Error("Form not found!");
     }
 
+    if (form.signedByAuthority.isSigned) {
+      return res.status(400).json({ message: "Form already signed!" });
+    }
+
     const signedByAuthority = {
       isSigned: true,
       authority: authorityData._id,
@@ -50,11 +54,9 @@ const approveFormByAuthority = async (req, res) => {
       authorityData._id
     );
 
-    res
-      .status(200)
-      .json({ status: "success", message: "Form signed successfully!" });
+    res.status(200).json({ message: "Form signed successfully!" });
   } catch (err) {
-    res.status(400).json({ status: "error", message: err.message });
+    res.status(400).json({ message: err.message });
   }
 };
 
@@ -102,11 +104,9 @@ const rejectFormByAuthority = async (req, res) => {
       authorityData._id
     );
 
-    res
-      .status(200)
-      .json({ status: "success", message: "Form rejected successfully!" });
+    res.status(200).json({ message: "Form rejected successfully!" });
   } catch (err) {
-    res.status(400).json({ status: "error", message: err.message });
+    res.status(400).json({ message: err.message });
   }
 };
 

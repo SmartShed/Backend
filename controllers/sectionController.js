@@ -147,9 +147,22 @@ const getOpenedFormsBySectionName = async (req, res) => {
 
     const formIds = section.forms;
 
-    let forms = await Form.find({ formID: { $in: formIds } })
-      .populate("createdBy")
-      .sort({ updatedAt: -1 });
+    let forms = await Form.find(
+      { formID: { $in: formIds } },
+      {
+        title: 1,
+        descriptionEnglish: 1,
+        descriptionHindi: 1,
+        locoName: 1,
+        locoNumber: 1,
+        createdAt: 1,
+        updatedAt: 1,
+        lockStatus: 1,
+        createdBy: 1,
+      }
+    )
+      .sort({ updatedAt: -1 })
+      .populate("createdBy", "-password -isDeleted -isGoogle -forms -__v");
 
     if (!forms.length) {
       return res.status(200).json({
@@ -157,24 +170,6 @@ const getOpenedFormsBySectionName = async (req, res) => {
         forms: [],
       });
     }
-
-    forms = forms.map((form) => {
-      return {
-        id: form._id,
-        locoName: form.locoName,
-        locoNumber: form.locoNumber,
-        title: form.title,
-        descriptionHindi: form.descriptionHindi,
-        descriptionEnglish: form.descriptionEnglish,
-        createdAt: form.createdAt,
-        updatedAt: form.updatedAt,
-        createdBy: {
-          id: form.createdBy._id,
-          name: form.createdBy.name,
-          section: form.createdBy.section,
-        },
-      };
-    });
 
     res.status(200).json({
       message: "Forms fetched successfully",

@@ -32,28 +32,22 @@ const getRecentForms = async (req, res) => {
 
     const formIds = user.forms;
 
-    let forms = await Form.find({ _id: { $in: formIds } })
+    const forms = await Form.find(
+      { _id: { $in: formIds } },
+      {
+        title: 1,
+        descriptionEnglish: 1,
+        descriptionHindi: 1,
+        locoName: 1,
+        locoNumber: 1,
+        createdAt: 1,
+        updatedAt: 1,
+        lockStatus: 1,
+        createdBy: 1,
+      }
+    )
       .sort({ updatedAt: -1 })
-      .populate("createdBy");
-
-    forms = forms.map((form) => {
-      return {
-        id: form._id,
-        title: form.title,
-        locoName: form.locoName,
-        locoNumber: form.locoNumber,
-        descriptionEnglish: form.descriptionEnglish,
-        descriptionHindi: form.descriptionHindi,
-        createdAt: form.createdAt,
-        updatedAt: form.updatedAt,
-        createdBy: {
-          id: user._id,
-          name: user.name,
-          section: user.section,
-        },
-        lockStatus: form.lockStatus,
-      };
-    });
+      .populate("createdBy", "-password -isDeleted -isGoogle -forms -__v");
 
     const response = {
       message: "Forms fetched successfully",
@@ -163,51 +157,29 @@ const getRecentFormsBySectionName = async (req, res) => {
 
     const formIds = section.forms;
 
-    let forms = await Form.find({ formID: { $in: formIds } })
-      .populate("createdBy")
-      .sort({ updatedAt: -1 });
-
-    let newForms = [];
-
-    for (let j = 0; j < forms.length; j++) {
-      let access = forms[j].access;
-
-      for (let i = 0; i < access.length; i++) {
-        if (access[i].equals(user._id)) {
-          newForms.push(forms[j]);
-        }
+    const forms = await Form.find(
+      {
+        formID: { $in: formIds },
+        access: user._id,
+      },
+      {
+        title: 1,
+        descriptionEnglish: 1,
+        descriptionHindi: 1,
+        locoName: 1,
+        locoNumber: 1,
+        createdAt: 1,
+        updatedAt: 1,
+        lockStatus: 1,
+        createdBy: 1,
       }
-    }
-
-    if (!newForms.length) {
-      return res.status(200).json({
-        message: "No forms found",
-        forms: [],
-      });
-    }
-    newForms = newForms.map((newForm) => {
-      return {
-        id: newForm._id,
-        title: newForm.title,
-        descriptionEnglish: newForm.descriptionEnglish,
-        descriptionHindi: newForm.descriptionHindi,
-        locoName: newForm.locoName,
-        locoNumber: newForm.locoNumber,
-        createdAt: newForm.createdAt,
-        updatedAt: newForm.updatedAt,
-        lockStatus: newForm.lockStatus,
-        createdBy: {
-          id: user._id,
-          name: user.name,
-          section: user.section,
-        },
-        createdAt: newForm.createdAt,
-      };
-    });
+    )
+      .populate("createdBy", "-password -isDeleted -isGoogle -forms -__v")
+      .sort({ updatedAt: -1 });
 
     res.status(200).json({
       message: "Forms fetched successfully",
-      forms: newForms,
+      forms,
     });
   } catch (err) {
     res.status(400).json({ status: "error", message: err.message });

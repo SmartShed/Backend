@@ -157,6 +157,8 @@ const createForm = async (req, res) => {
         id: user._id,
         name: user.name,
         section: user.section,
+        position: user.position,
+        email: user.email,
       },
       lockStatus: newForm.lockStatus,
     };
@@ -211,31 +213,6 @@ const getForm = async (req, res) => {
   try {
     const form_id = req.params.form_id;
 
-    /*
-    signedBySupervisor: {
-      isSigned: {
-        type: Boolean,
-        default: false,
-      },
-      supervisor: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-      signedAt: { type: Date, default: Date.now },
-    },
-    signedByAuthority: {
-      isSigned: {
-        type: Boolean,
-        default: false,
-      },
-      authority: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-      signedAt: { type: Date, default: Date.now },
-    },
-    */
-
     const form = await Form.findById(form_id)
       .populate("questions")
       .populate({
@@ -245,18 +222,18 @@ const getForm = async (req, res) => {
           model: "Question",
         },
       })
-      .populate("createdBy", "_id name section")
+      .populate("createdBy", "_id name section position email")
       .populate({
         path: "history.editedBy",
         model: "User",
-        select: "_id name section",
+        select: "_id name section position email",
       })
       .populate({
         path: "signedBySupervisor",
         populate: {
           path: "supervisor",
           model: "User",
-          select: "_id name section",
+          select: "_id name section position email",
         },
         match: { "signedBySupervisor.isSigned": true },
       })
@@ -265,7 +242,7 @@ const getForm = async (req, res) => {
         populate: {
           path: "authority",
           model: "User",
-          select: "_id name section",
+          select: "_id name section position email",
         },
         match: { "signedByAuthority.isSigned": true },
       });
@@ -275,8 +252,7 @@ const getForm = async (req, res) => {
     }
 
     const history = form.history.map((h) => ({
-      editedBy: h.editedBy.name,
-      section: h.editedBy.section,
+      editedBy: h.editedBy,
       editedAt: h.editedAt,
       changes: h.changes,
     }));

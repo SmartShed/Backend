@@ -450,7 +450,10 @@ const users = async (req, res) => {
       ? position.split(",")
       : ["authority", "supervisor", "worker"];
 
-    const users = await User.find({ position: { $in: positions } });
+    const users = await User.find({
+      position: { $in: positions },
+      isDeleted: false,
+    });
 
     const authorityList = [];
     const supervisorList = [];

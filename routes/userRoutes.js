@@ -25,6 +25,6 @@ router.post("/forgot-password", forgotPassword);
 router.post("/validate-otp", validateOTP);
 router.post("/reset-password", resetPassword);
 router.get("/getuser/:id", getUser);
-router.get("/validate", isAuthTokenValid);
+router.get("/validate-token", isAuthTokenValid);
 
 module.exports = router;

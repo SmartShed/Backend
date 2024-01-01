@@ -95,6 +95,7 @@ const login = async (req, res) => {
         email: user.email,
         name: user.name,
         position: user.position,
+        section: user.section,
       },
     });
   } catch (err) {
@@ -182,6 +183,7 @@ const register = async (req, res) => {
         email: newUser.email,
         name: newUser.name,
         position: newUser.position,
+        section: newUser.section,
       },
     });
   } catch (err) {
@@ -234,6 +236,7 @@ const googleLogin = async (req, res) => {
         email: user.email,
         name: user.name,
         position: user.position,
+        section: user.section,
       },
     });
   } catch (err) {
@@ -301,7 +304,7 @@ const googleRegister = async (req, res) => {
 
     const supervisorIds = await getSupervisorIdsBySection(newUser.section);
 
-    const notifications = await createNotifications(
+    await createNotifications(
       supervisorIds,
       "A new worker has been added to your section",
       "आपके अनुभाग में एक नया मजदूर जोड़ा गया है",

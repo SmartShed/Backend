@@ -2,124 +2,77 @@ const Form = require("../../models/Form");
 
 const getAllUnSignedForms = async (req, res) => {
   try {
-    let forms = await Form.find({
+    const forms = await Form.find({
       "signedBySupervisor.isSigned": true,
       "signedByAuthority.isSigned": false,
     })
-      .populate("createdBy")
-      .populate("signedBySupervisor");
-
-    forms = forms.map((form) => {
-      return {
-        formID: form.formID,
-        _id: form._id,
-        locoName: form.locoName,
-        locoNumber: form.locoNumber,
-        title: form.title,
-        descriptionHindi: form.descriptionHindi,
-        descriptionEnglish: form.descriptionEnglish,
-        submittedCount: form.submittedCount,
-        lockStatus: form.lockStatus,
-        signedBySupervisor: form.signedBySupervisor,
-        createdBy: {
-          id: form.createdBy._id,
-          name: form.createdBy.name,
-          section: form.createdBy.section,
+      .populate({
+        path: "signedBySupervisor",
+        populate: {
+          path: "supervisor",
+          model: "User",
+          select: "_id name section position email",
         },
-        submittedBy: form.submittedBy,
-        createdAt: form.createdAt,
-        updatedAt: form.updatedAt,
-      };
-    });
-    res
-      .status(200)
-      .json({ message: "Forms fetched successfully", forms: forms });
+      })
+      .populate("createdBy", "-password -isDeleted -isGoogle -forms -__v");
+
+    res.status(200).json({ message: "Forms fetched successfully", forms });
   } catch (err) {
-    res.status(400).json({ status: "error", message: err.message });
+    res.status(400).json({ message: err.message });
   }
 };
 
 const getAllSignedForms = async (req, res) => {
   try {
-    let forms = await Form.find({
+    const forms = await Form.find({
       "signedBySupervisor.isSigned": true,
       "signedByAuthority.isSigned": true,
     })
-      .populate("createdBy")
-      .populate("signedBySupervisor");
-
-    forms = forms.map((form) => {
-      return {
-        formID: form.formID,
-        _id: form._id,
-        locoName: form.locoName,
-        locoNumber: form.locoNumber,
-        title: form.title,
-        descriptionHindi: form.descriptionHindi,
-        descriptionEnglish: form.descriptionEnglish,
-        submittedCount: form.submittedCount,
-        lockStatus: form.lockStatus,
-        signedBySupervisor: form.signedBySupervisor,
-        createdBy: {
-          id: form.createdBy._id,
-          name: form.createdBy.name,
-          section: form.createdBy.section,
+      .populate({
+        path: "signedBySupervisor",
+        populate: {
+          path: "supervisor",
+          model: "User",
+          select: "_id name section position email",
         },
-        submittedBy: form.submittedBy,
-        createdAt: form.createdAt,
-        updatedAt: form.updatedAt,
-      };
-    });
+      })
+      .populate("createdBy", "-password -isDeleted -isGoogle -forms -__v");
 
-    res
-      .status(200)
-      .json({ message: "Forms fetched successfully", forms: forms });
+    res.status(200).json({ message: "Forms fetched successfully", forms });
   } catch (err) {
-    res.status(400).json({ status: "error", message: err.message });
+    res.status(400).json({ message: err.message });
   }
 };
 
 const getSignedFormsOfAuthority = async (req, res) => {
   try {
     const authorityID = req.params.authorityID;
-    let forms = await Form.find({
+    const forms = await Form.find({
       "signedBySupervisor.isSigned": true,
       "signedByAuthority.isSigned": true,
       "signedByAuthority.signedBy": authorityID,
     })
-      .populate("createdBy")
-      .populate("signedBySupervisor.supervisor")
-      .populate("signedByAuthority.authority");
-
-    forms = forms.map((form) => {
-      return {
-        formID: form.formID,
-        _id: form._id,
-        locoName: form.locoName,
-        locoNumber: form.locoNumber,
-        title: form.title,
-        descriptionHindi: form.descriptionHindi,
-        descriptionEnglish: form.descriptionEnglish,
-        submittedCount: form.submittedCount,
-        lockStatus: form.lockStatus,
-        signedBySupervisor: form.signedBySupervisor,
-        createdBy: {
-          id: form.createdBy._id,
-          name: form.createdBy.name,
-          section: form.createdBy.section,
+      .populate({
+        path: "signedBySupervisor",
+        populate: {
+          path: "supervisor",
+          model: "User",
+          select: "_id name section position email",
         },
-        submittedBy: form.submittedBy,
-        createdAt: form.createdAt,
-        updatedAt: form.updatedAt,
-      };
-    });
+      })
+      .populate({
+        path: "signedByAuthority",
+        populate: {
+          path: "authority",
+          model: "User",
+          select: "_id name section position email",
+        },
+      })
+      .populate("createdBy", "-password -isDeleted -isGoogle -forms -__v");
 
-    res.status(200).json({
-      message: "Forms fetched successfully",
-      forms: forms,
-    });
+    res.status(200).json({ message: "Forms fetched successfully", forms });
   } catch (err) {
-    res.status(400).json({ status: "error", message: err.message });
+    res.status(400).json({ message: err.message });
   }
 };
 

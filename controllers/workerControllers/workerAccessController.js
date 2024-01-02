@@ -83,53 +83,32 @@ const getRecentFormsBySectionId = async (req, res) => {
 
     const formIds = section.forms;
 
-    let forms = await Form.find({ formID: { $in: formIds } }).populate(
-      "createdBy"
-    );
-
-    let newForms = [];
-
-    for (let j = 0; j < forms.length; j++) {
-      let access = forms[j].access;
-
-      for (let i = 0; i < access.length; i++) {
-        if (access[i].equals(user._id)) {
-          newForms.push(forms[j]);
-        }
+    const forms = await Form.find(
+      {
+        formID: { $in: formIds },
+        access: user._id,
+      },
+      {
+        title: 1,
+        descriptionEnglish: 1,
+        descriptionHindi: 1,
+        locoName: 1,
+        locoNumber: 1,
+        createdAt: 1,
+        updatedAt: 1,
+        lockStatus: 1,
+        createdBy: 1,
       }
-    }
-
-    if (!newForms.length) {
-      return res.status(200).json({
-        message: "No forms found",
-        forms: [],
-      });
-    }
-    newForms = newForms.map((newForm) => {
-      return {
-        id: newForm._id,
-        title: newForm.title,
-        descriptionEnglish: newForm.descriptionEnglish,
-        descriptionHindi: newForm.descriptionHindi,
-        locoName: newForm.locoName,
-        locoNumber: newForm.locoNumber,
-        createdAt: newForm.createdAt,
-        updatedAt: newForm.updatedAt,
-        lockStatus: newForm.lockStatus,
-        createdBy: {
-          id: user._id,
-          name: user.name,
-          section: user.section,
-        },
-      };
-    });
+    )
+      .populate("createdBy", "-password -isDeleted -isGoogle -forms -__v")
+      .sort({ updatedAt: -1 });
 
     res.status(200).json({
       message: "Forms fetched successfully",
-      forms: newForms,
+      forms,
     });
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(400).json({ status: "error", message: err.message });
   }
 };
 
@@ -202,19 +181,14 @@ const getSubmittedFormsOfWorker = async (req, res) => {
       throw new Error("Invalid auth token");
     }
 
-    workerId = worker.user._id;
-
-    console.log(workerId);
+    const workerId = worker.user._id;
 
     const submittedForms = await Form.find({ submittedBy: workerId });
-    console.log(submittedForms);
 
     const formsWithAccess = await Form.find({
       access: { $in: [workerId] },
       submittedBy: { $ne: workerId },
     });
-
-    console.log(formsWithAccess);
 
     res.status(200).json({
       message: "Forms fetched successfully",

@@ -10,6 +10,6 @@ router.post("/delete/users", deleteUsers);
 router.post("/faq", faq);
 router.get("/faqs/:position", faqs);
 
-router.get("/search/:search_param", searchForms);
+router.get("/search", searchForms);
 
 module.exports = router;

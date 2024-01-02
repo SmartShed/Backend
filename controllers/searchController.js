@@ -2,14 +2,18 @@ const Form = require("../models/Form");
 
 const searchForms = async (req, res) => {
   try {
-    const searchParam = req.params.search_param;
+    let { title, type, number } = req.query;
+
+    if (!title) title = "";
+    if (!type) type = "";
+    if (!number) number = "";
 
     const forms = await Form.find(
       {
-        $or: [
-          { title: { $regex: searchParam, $options: "i" } },
-          { locoName: { $regex: searchParam, $options: "i" } },
-          { locoNumber: { $regex: searchParam, $options: "i" } },
+        $and: [
+          { title: { $regex: title, $options: "i" } },
+          { locoName: { $regex: type, $options: "i" } },
+          { locoNumber: { $regex: number, $options: "i" } },
         ],
       },
       {

@@ -1,57 +1,5 @@
 # SmartShed Backend
 
-### Folder Structure
-
-```
-backend/
-|
-|-- config/
-|   |-- index.js
-|   |-- database.js
-|
-|-- controllers/
-|   |-- index.js
-|   |-- userController.js
-|   |-- formController.js
-|   |-- sectionController.js
-|
-|-- helpers/
-|   |-- index.js
-|
-|-- middlewares/
-|   |-- index.js
-|   |-- authentication.js
-|   |-- errorHandling.js
-|
-|-- models/
-|   |-- AuthToken.js
-|   |-- Form.js
-|   |-- FormData.js
-|   |-- Question.js
-|   |-- QuestionData.js
-|   |-- SectionData.js
-|   |-- User.js
-|
-|-- routes/
-|   |-- index.js
-|   |-- userRoutes.js
-|   |-- formRoutes.js
-|   |-- sectionRoutes.js
-|
-|-- utils/
-|   |-- index.js
-|   |-- customErrorHandler.js
-|
-|-- .env.example
-|-- .gitignore
-|-- index.js
-|-- package.json
-|-- package-lock.json
-|-- README.md
-```
-
-# API's
-
 ## 1. Authentication APIs
 
 ### 1.1. Login

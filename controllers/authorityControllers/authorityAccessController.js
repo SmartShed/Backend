@@ -31,7 +31,6 @@ const getAllSignedForms = async (req, res) => {
   try {
     const forms = await Form.find(
       {
-        "signedBySupervisor.isSigned": true,
         "signedByAuthority.isSigned": true,
       },
       {
@@ -45,7 +44,9 @@ const getAllSignedForms = async (req, res) => {
         lockStatus: 1,
         createdBy: 1,
       }
-    ).populate("createdBy", "-password -isDeleted -isGoogle -forms -__v");
+    )
+      .populate("createdBy", "-password -isDeleted -isGoogle -forms -__v")
+      .sort({ updatedAt: -1 });
 
     res.status(200).json({ message: "Forms fetched successfully", forms });
   } catch (err) {

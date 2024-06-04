@@ -49,7 +49,7 @@ const addForm = async (req, res) => {
       authorityIDs,
       `New form added ${title} in section ${section.name}`,
       `नया फॉर्म जोड़ा गया ${title} अनुभाग में ${section.name}`,
-      form._id,
+      null,
       null
     );
 
@@ -57,7 +57,7 @@ const addForm = async (req, res) => {
       supervisorIDs,
       `New form added ${title} in section ${section.name}`,
       `नया फॉर्म जोड़ा गया ${title} अनुभाग में ${section.name}`,
-      form._id,
+      null,
       null
     );
 

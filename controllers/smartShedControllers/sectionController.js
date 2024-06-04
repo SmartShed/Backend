@@ -31,7 +31,7 @@ const addSection = async (req, res) => {
       authorityIDs,
       `New section added ${name}`,
       `नया अनुभाग जोड़ा गया ${name}`,
-      section._id,
+      null,
       null
     );
 
@@ -39,7 +39,7 @@ const addSection = async (req, res) => {
       supervisorIDs,
       `New section added ${name}`,
       `नया अनुभाग जोड़ा गया ${name}`,
-      section._id,
+      null,
       null
     );
 

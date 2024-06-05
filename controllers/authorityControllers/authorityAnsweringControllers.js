@@ -96,13 +96,15 @@ const rejectFormByAuthority = async (req, res) => {
 
     const supervisorID = form.signedBySupervisor.supervisor;
 
-    await createNotification(
-      supervisorID,
-      `Form rejected by authority ${authorityData.name} for the loco ${form.locoName} ${form.locoNumber}`,
-      `प्राधिकरण ${authorityData.name} द्वारा लोको ${form.locoName} ${form.locoNumber} के लिए फॉर्म अस्वीकृत किया गया`,
-      form._id,
-      authorityData._id
-    );
+    if (supervisorID) {
+      await createNotification(
+        supervisorID,
+        `Form rejected by authority ${authorityData.name} for the loco ${form.locoName} ${form.locoNumber}`,
+        `प्राधिकरण ${authorityData.name} द्वारा लोको ${form.locoName} ${form.locoNumber} के लिए फॉर्म अस्वीकृत किया गया`,
+        form._id,
+        authorityData._id
+      );
+    }
 
     res.status(200).json({ message: "Form rejected successfully!" });
   } catch (err) {

@@ -380,12 +380,7 @@ const forgotPassword = async (req, res) => {
 
     await newOtp.save();
 
-    const emailResponse = await sendMail(user.name, email, otp);
-
-    if (emailResponse === -1) {
-      await Otp.deleteOne({ otp });
-      return res.status(400).json({ message: "Error sending email" });
-    }
+    sendMail(user.name, email, otp);
 
     res.status(200).json({ message: "OTP sent successfully" });
   } catch (err) {

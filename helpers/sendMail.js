@@ -3,11 +3,6 @@ const nodemailer = require("nodemailer");
 const fs = require("fs");
 const path = require("path");
 
-const otpEmailTemplate = fs.readFileSync(
-  path.resolve(__dirname, "otpEmailTemplate.html"),
-  { encoding: "utf-8" }
-);
-
 const sendMail = (userName, userEmail, otp) => {
   let mailTransporter = nodemailer.createTransport({
     service: "gmail",
@@ -16,6 +11,11 @@ const sendMail = (userName, userEmail, otp) => {
       pass: PASSWORD,
     },
   });
+
+  let otpEmailTemplate = fs.readFileSync(
+    path.resolve(__dirname, "otpEmailTemplate.html"),
+    { encoding: "utf-8" }
+  );
 
   const emailBody = otpEmailTemplate
     .replaceAll("$$NAME$$", userName)
@@ -28,7 +28,7 @@ const sendMail = (userName, userEmail, otp) => {
       address: EMAIL,
     },
     to: userEmail,
-    subject: "SmartShed Forgot Password OTP",
+    subject: `SmartShed Forgot Password OTP - ${otp}`,
     text: `Your One Time Password (OTP) for SmartShed is ${otp}. Please use this code to reset your password.`,
     html: emailBody,
   };
